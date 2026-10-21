@@ -17,7 +17,13 @@ MAX_FRAME_BYTES = 64 * 1024  # largest message body we accept
 
 
 class ProtocolError(Exception):
-    """Raised when a peer sends data that is not a valid frame."""
+    """A frame arrived whole but its content is invalid. The stream is still
+    in sync, so the connection can carry on."""
+
+
+class FrameError(ProtocolError):
+    """The framing itself is broken. The stream can no longer be trusted, so
+    the connection must be closed."""
 
 
 def encode(message):
@@ -64,7 +70,7 @@ def recv_message(sock):
         return None
     (length,) = HEADER.unpack(header)
     if length > MAX_FRAME_BYTES:
-        raise ProtocolError(f"frame too large ({length} bytes)")
+        raise FrameError(f"frame too large ({length} bytes)")
     body = _recv_exact(sock, length)
     if body is None:
         return None
