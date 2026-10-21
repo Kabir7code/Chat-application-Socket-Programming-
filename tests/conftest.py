@@ -33,11 +33,17 @@ class WireClient:
             if message is None or message["type"] == msg_type:
                 return message
 
-    def assert_silent(self, wait=0.3):
-        """Check that nothing arrives within `wait` seconds."""
+    def assert_silent(self, wait=0.3, ignore=("system",)):
+        """Check that no message arrives within `wait` seconds.
+
+        Join/leave notices are ignored by default: they can race with
+        registration and are not what these checks are about."""
         self.sock.settimeout(wait)
         try:
-            message = self.recv()
+            while True:
+                message = self.recv()
+                if message is None or message["type"] not in ignore:
+                    break
         except socket.timeout:
             return
         finally:
