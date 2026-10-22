@@ -1,4 +1,6 @@
-"""Host/port configuration shared by the server and the client (#10).
+"""#10 (NFR-004): host/port settings shared by the server and the client.
+
+Nothing is hard-coded in the server or client any more; both read from here.
 
 Priority: command-line flag > environment variable > default.
 
@@ -14,6 +16,10 @@ DEFAULT_PORT = 5000
 
 
 def parse_args(description, argv=None):
+    """Read --host and --port, falling back to env vars, then defaults.
+
+    `argv` is only passed in tests; normally argparse reads sys.argv.
+    """
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument(
         "--host",
