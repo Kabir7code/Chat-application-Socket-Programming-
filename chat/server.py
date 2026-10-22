@@ -1,41 +1,68 @@
 """Chat server: accepts many clients at once, one thread per client (FR-002).
 
-Every client must register a unique username first (FR-001). After that,
-chat lines are delivered in real time to everyone else (FR-003), and other
-users are told when someone joins or leaves (FR-006).
+Every client must register a unique username first (FR-001, NFR-005). After
+that, chat lines are delivered in real time to everyone else (FR-003),
+private messages go to one user only (FR-005), and other users are told when
+someone joins or leaves (FR-006). A client that quits, crashes or sends bad
+data is cleaned up without affecting anyone else (FR-007, FR-008).
 """
 
 import re
 import socket
+import sys
 import threading
 import time
+import traceback
 
 from chat import config, protocol
+from chat.registry import Session, SessionRegistry
 
-# #2 (FR-001): a valid username is 1-20 letters, digits or underscores.
-# This also rejects empty names and the 50-character name from test UT_03.
 USERNAME_PATTERN = re.compile(r"^[A-Za-z0-9_]{1,20}$")
+MAX_TEXT_LENGTH = 4000
+
+# Detect peers that vanish without closing the connection (cable pulled,
+# laptop asleep): the OS probes an idle connection and gives up after
+# about IDLE + INTERVAL * COUNT seconds.
+KEEPALIVE_IDLE = 10
+KEEPALIVE_INTERVAL = 5
+KEEPALIVE_COUNT = 3
 
 
 def system_message(event, username, text):
-    """#5 (FR-006): a server notice such as "bob joined the chat"."""
     return {"type": "system", "event": event, "username": username, "text": text}
 
 
 def error_message(code, text):
-    """An error sent back to one client. `code` is for programs, `message`
-    is the text shown to the user."""
     return {"type": "error", "code": code, "message": text}
+
+
+def enable_keepalive(conn):
+    conn.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+    for name, value in (
+        ("TCP_KEEPIDLE", KEEPALIVE_IDLE),
+        ("TCP_KEEPINTVL", KEEPALIVE_INTERVAL),
+        ("TCP_KEEPCNT", KEEPALIVE_COUNT),
+    ):
+        if hasattr(socket, name):  # not every OS exposes every option
+            conn.setsockopt(socket.IPPROTO_TCP, getattr(socket, name), value)
 
 
 class ChatServer:
     def __init__(self, host=config.DEFAULT_HOST, port=config.DEFAULT_PORT):
         self.host = host
         self.port = port
-        self.clients = []  # every connected socket, registered or not
-        self.users = {}  # #2: username -> socket, only users who registered
+        self.registry = SessionRegistry()
         self._listener = None
         self._running = threading.Event()
+
+    # Read-only views, handy for tests and debugging.
+    @property
+    def clients(self):
+        return self.registry.connected()
+
+    @property
+    def users(self):
+        return self.registry.usernames()
 
     # ------------------------------------------------------------ lifecycle
     def start(self):
@@ -64,8 +91,8 @@ class ChatServer:
         self._running.clear()
         if self._listener:
             self._listener.close()
-        for conn in list(self.clients):
-            conn.close()
+        for session in self.registry.connected():
+            session.close()
 
     # -------------------------------------------------------------- workers
     def _accept_loop(self):
@@ -74,91 +101,120 @@ class ChatServer:
                 conn, _addr = self._listener.accept()
             except OSError:
                 break  # listener closed
-            self.clients.append(conn)
-            threading.Thread(target=self._handle_client, args=(conn,), daemon=True).start()
+            enable_keepalive(conn)
+            session = Session(conn)
+            self.registry.connect(session)
+            threading.Thread(target=self._handle_client, args=(session,), daemon=True).start()
 
-    def _handle_client(self, conn):
-        """Runs in its own thread for one client until they disconnect."""
-        username = None  # stays None until registration succeeds (#2)
+    def _handle_client(self, session):
         try:
-            while True:
-                message = protocol.recv_message(conn)
-                if message is None:  # client closed the connection
-                    break
-                if username is None:
-                    # #2 (FR-001): the first thing a client must do is register.
-                    if message["type"] == "register":
-                        username = self._register(conn, message.get("username", ""))
+            while session.alive:
+                try:
+                    message = protocol.recv_message(session.conn)
+                except protocol.FrameError:
+                    session.send(error_message("MALFORMED", "Invalid frame; disconnecting."))
+                    break  # stream is out of sync, cannot continue
+                except protocol.ProtocolError:
+                    session.send(error_message("MALFORMED", "Message was not valid JSON."))
                     continue
-                if message["type"] == "chat":
-                    self._deliver_chat(username, message.get("text", ""))  # #3
+                except OSError:
+                    break  # connection reset, timed out, or closed (FR-007)
+                if message is None or message["type"] == "quit":
+                    break
+                try:
+                    self._dispatch(session, message)
+                except Exception:  # one bad message must not kill the session (FR-008)
+                    traceback.print_exc(file=sys.stderr)
+                    session.send(error_message("SERVER_ERROR", "Could not process message."))
         finally:
-            # Runs however the loop ended, so the user is always cleaned up.
-            if conn in self.clients:
-                self.clients.remove(conn)
-            # Check the socket matches: only the owner of a name may release it.
-            if username is not None and self.users.get(username) is conn:
-                del self.users[username]  # frees the name for reuse
-                # #5 (FR-006): tell everyone still online that this user left.
-                self._broadcast(
-                    system_message("leave", username, f"{username} left the chat")
-                )
-            conn.close()
+            self._disconnect(session)
+
+    def _disconnect(self, session):
+        was_registered = self.registry.disconnect(session)
+        session.close()
+        if was_registered:
+            self._broadcast(
+                system_message("leave", session.username, f"{session.username} left the chat")
+            )
 
     # ------------------------------------------------------------- features
-    def _register(self, conn, username):
-        """#2 (FR-001, UC-01): claim a unique username for this connection.
+    def _dispatch(self, session, message):
+        kind = message["type"]
+        if session.username is None:
+            if kind == "register":
+                self._register(session, message.get("username", ""))
+            else:  # NFR-005: only registered sockets may send messages
+                session.send(error_message("NOT_REGISTERED", "Register a username first."))
+            return
+        if kind == "register":
+            session.send(error_message("ALREADY_REGISTERED", "You are already registered."))
+        elif kind == "chat":
+            self._deliver_chat(session, message.get("text"))
+        elif kind == "private":
+            self._deliver_private(session, message.get("to"), message.get("text"))
+        else:
+            session.send(error_message("UNKNOWN_TYPE", f"Unknown message type '{kind}'."))
 
-        Returns the username on success. On failure it sends an error and
-        returns None, and the client may try again with another name.
-        """
-        username = str(username).strip()  # "  bob " counts as "bob"
+    def _register(self, session, username):
+        username = str(username).strip()
         if not USERNAME_PATTERN.match(username):
-            protocol.send_message(conn, error_message(
+            session.send(error_message(
                 "INVALID_USERNAME",
                 "Username must be 1-20 letters, digits or underscores.",
             ))
-            return None
-        if username in self.users:
-            # UC-01 alternative flow 3B: wording taken from our use-case doc.
-            protocol.send_message(conn, error_message(
-                "USERNAME_TAKEN", "Username already taken."
-            ))
-            return None
-        self.users[username] = conn
-        # Confirm, and include who is online so the client can show it.
-        protocol.send_message(conn, {
+            return
+        if not self.registry.register(session, username):
+            session.send(error_message("USERNAME_TAKEN", "Username already taken."))
+            return
+        session.send({
             "type": "registered",
             "username": username,
-            "users": sorted(self.users),
+            "users": self.registry.usernames(),
         })
-        # #5 (FR-006): tell everyone else that a new user has joined.
         self._broadcast(
             system_message("join", username, f"{username} joined the chat"),
-            exclude=conn,
+            exclude=session,
         )
-        return username
 
-    def _deliver_chat(self, sender, text):
-        """#3 (FR-003): push a chat line to every other user immediately.
+    def _valid_text(self, session, text):
+        if not isinstance(text, str) or not text.strip():
+            session.send(error_message("EMPTY_MESSAGE", "Message text is empty."))
+            return False
+        if len(text) > MAX_TEXT_LENGTH:
+            session.send(error_message(
+                "MESSAGE_TOO_LONG", f"Messages are limited to {MAX_TEXT_LENGTH} characters."
+            ))
+            return False
+        return True
 
-        The server sends as soon as the message arrives, so clients never
-        need to refresh or poll. "context" says where the message belongs;
-        Sprint 2 adds "group".
-        """
-        message = protocol.make_chat_message(text, sender)
+    def _deliver_chat(self, session, text):
+        if not self._valid_text(session, text):
+            return
+        message = protocol.make_chat_message(text, session.username)
         message["context"] = "general"
-        self._broadcast(message, exclude=self.users.get(sender))
+        self._broadcast(message, exclude=session)
+
+    def _deliver_private(self, session, recipient_name, text):
+        """FR-005: only the sender and the recipient ever see it."""
+        if not self._valid_text(session, text):
+            return
+        recipient = self.registry.get(str(recipient_name))
+        if recipient is None or not recipient.send({
+            "type": "private",
+            "from": session.username,
+            "to": recipient_name,
+            "text": text,
+        }):
+            session.send(error_message("USER_NOT_FOUND", "User not found/offline"))
+            return
+        session.send({"type": "private_sent", "to": recipient_name, "text": text})
 
     def _broadcast(self, message, exclude=None):
-        """Send to every registered user except `exclude`.
-
-        Unregistered sockets are skipped on purpose: they have not joined
-        the chat yet, so they must not see anyone's messages.
-        """
-        for conn in list(self.users.values()):  # copy: other threads may change it
-            if conn is not exclude:
-                protocol.send_message(conn, message)
+        """Send to every registered user except `exclude`. A recipient whose
+        socket has failed is skipped; their own thread cleans them up."""
+        for session in self.registry.registered():
+            if session is not exclude:
+                session.send(message)
 
 
 def main():
