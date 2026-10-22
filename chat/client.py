@@ -1,4 +1,11 @@
-"""Terminal chat client: one copy runs per user."""
+"""Terminal chat client.
+
+Commands:
+    <text>               send to everyone
+    /msg <user> <text>   private message to one user
+    /quit                leave the chat
+    /help                show commands
+"""
 
 import socket
 import sys
@@ -6,24 +13,51 @@ import threading
 
 from chat import config, protocol
 
+HELP = """Commands:
+  <text>               send to everyone
+  /msg <user> <text>   private message to one user
+  /quit                leave the chat
+  /help                show this help"""
+
 
 def format_message(message):
-    """Turn a message from the server into one line of text to print."""
     kind = message["type"]
     if kind == "chat":
         return f"{message['from']}: {message['text']}"
-    if kind == "system":  # #5: join/leave notices are marked with "*"
+    if kind == "private":
+        return f"[private] {message['from']}: {message['text']}"
+    if kind == "private_sent":
+        return f"[private to {message['to']}] {message['text']}"
+    if kind == "system":
         return f"* {message['text']}"
-    if kind == "error":  # errors such as "Username already taken." get "!"
+    if kind == "error":
         return f"! {message['message']}"
     return str(message)
 
 
-def register(sock):
-    """#2 (FR-001, UC-01): ask for a username until the server accepts one.
+def parse_command(line):
+    """Turn a typed line into a message dict, or a string to show locally.
 
-    Returns the accepted name, or None if the user quit or the server closed.
+    Returns (message, local_text); exactly one of them is not None, except
+    for /quit which returns ({"type": "quit"}, None).
     """
+    if not line.startswith("/"):
+        return {"type": "chat", "text": line}, None
+    command, _, rest = line.partition(" ")
+    if command == "/msg":
+        recipient, _, text = rest.strip().partition(" ")
+        if not recipient or not text.strip():
+            return None, "Usage: /msg <user> <text>"
+        return {"type": "private", "to": recipient, "text": text}, None
+    if command == "/quit":
+        return {"type": "quit"}, None
+    if command == "/help":
+        return None, HELP
+    return None, f"Unknown command {command}. Type /help for commands."
+
+
+def register(sock):
+    """Ask for a username until the server accepts one (UC-01)."""
     while True:
         try:
             username = input("Choose a username: ").strip()
@@ -34,19 +68,14 @@ def register(sock):
         if reply is None:
             return None
         if reply["type"] == "registered":
-            # Show who else is online so the user knows who can read them.
             others = [u for u in reply["users"] if u != reply["username"]]
             print(f"Welcome, {reply['username']}! Online: {', '.join(others) or 'nobody yet'}")
+            print("Type /help for commands.")
             return reply["username"]
-        print(format_message(reply))  # e.g. name taken: loop and ask again
+        print(format_message(reply))
 
 
 def receive_loop(sock):
-    """#3 (FR-003): print messages the moment they arrive.
-
-    Runs in a background thread so incoming messages appear even while the
-    user is in the middle of typing.
-    """
     while True:
         try:
             message = protocol.recv_message(sock)
@@ -59,7 +88,7 @@ def receive_loop(sock):
 
 
 def main():
-    args = config.parse_args("Connect to the chat server.")  # #10: --host/--port
+    args = config.parse_args("Connect to the chat server.")
     try:
         sock = socket.create_connection((args.host, args.port))
     except OSError as exc:
@@ -69,12 +98,25 @@ def main():
             return
         threading.Thread(target=receive_loop, args=(sock,), daemon=True).start()
         for line in sys.stdin:
-            line = line.rstrip("\n")
-            if line:
-                protocol.send_message(sock, {"type": "chat", "text": line})
+            line = line.strip()
+            if not line:
+                continue
+            message, local_text = parse_command(line)
+            if local_text:
+                print(local_text)
+                continue
+            protocol.send_message(sock, message)
+            if message["type"] == "quit":
+                break
     except KeyboardInterrupt:
         pass
+    except OSError:
+        print("[connection lost]")
     finally:
+        try:
+            protocol.send_message(sock, {"type": "quit"})
+        except OSError:
+            pass
         sock.close()
 
 

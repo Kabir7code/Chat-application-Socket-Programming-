@@ -23,7 +23,6 @@ def test_sender_does_not_get_own_message(server, connect):
     alice, bob = connect("alice"), connect("bob")
     alice.send({"type": "chat", "text": "hello"})
     assert bob.recv_until("chat")["text"] == "hello"
-    alice.recv_until("system")  # bob's join notice
     alice.assert_silent()
 
 
