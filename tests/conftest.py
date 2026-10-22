@@ -50,11 +50,16 @@ class WireClient:
 
 @pytest.fixture
 def connect(server):
+    """connect() opens a raw connection; connect("alice") also registers."""
     clients = []
 
-    def _connect():
+    def _connect(username=None):
         client = WireClient(server)
         clients.append(client)
+        if username is not None:
+            client.send({"type": "register", "username": username})
+            reply = client.recv()
+            assert reply["type"] == "registered", reply
         return client
 
     yield _connect
