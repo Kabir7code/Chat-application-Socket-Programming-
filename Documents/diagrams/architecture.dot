@@ -1,65 +1,37 @@
-// Software architecture of the chat application.
-// Render: dot -Tpng architecture.dot -o ../Architecture_Diagram.png
+// Software architecture of the chat application (as built, Sprint 1).
+// Render: dot -Tpng -Gdpi=150 architecture.dot -o ../Architecture_Diagram.png
 digraph Architecture {
-  graph [rankdir=TB, fontname="Helvetica", fontsize=20, labelloc=t, pad=0.4, nodesep=0.5, ranksep=0.55, bgcolor=white,
-         label="Software Architecture: Real-Time Chat Application (Socket Programming)\nClient-Server pattern, thread-per-client server, length-prefixed JSON over TCP\n "];
-  node  [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12, color="#4A5568", penwidth=1.2, margin="0.18,0.08", fillcolor="#FFFFFF"];
+  ordering=out;
+  graph [rankdir=TB, fontname="Helvetica", fontsize=20, labelloc=t, pad=0.5, nodesep=0.6, ranksep=0.7, bgcolor=white, newrank=true,
+         label="Software Architecture: Real-Time Chat Application\nClient-Server, one thread per client, framed JSON over TCP\n "];
+  node  [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12, color="#4A5568", fillcolor="#FFFFFF", margin="0.2,0.1", width=2.6, height=0.75];
   edge  [fontname="Helvetica", fontsize=10, color="#4A5568", penwidth=1.2];
 
-  subgraph cluster_legend {
-    label="Legend"; style="rounded"; color="#CBD5E0"; fontsize=11; fontcolor="#4A5568";
-    built   [label="Built in Sprint 1", fillcolor="#C6F6D5"];
-    planned [label="Planned for Sprint 2", style="rounded,filled,dashed", fillcolor="#EDF2F7", fontcolor="#718096", color="#A0AEC0"];
-    built -> planned [style=invis];
-  }
-
   subgraph cluster_client {
-    label="CLIENT TIER (one instance per user)"; style="rounded,filled"; fillcolor="#EBF4FF"; color="#3182CE"; fontsize=14; fontcolor="#2B6CB0";
-    gui    [label="GUI client (Tkinter)\n#16", style="rounded,filled,dashed", fillcolor="#EDF2F7", fontcolor="#718096", color="#A0AEC0"];
-    cli    [label="Terminal UI  (client.py)\nprompts, prints messages\n#2, #3", fillcolor="#C6F6D5"];
-    parser [label="Command parser  (client.py)\n/msg  /quit  /help\n#4, #6", fillcolor="#C6F6D5"];
-    recv   [label="Receiver thread  (client.py)\nshows messages as they arrive\n#3", fillcolor="#C6F6D5"];
-    gui -> parser [style=dashed, color="#A0AEC0"];
-    cli -> parser;
+    label="CLIENT  (one per user)"; style="rounded,filled"; fillcolor="#EBF4FF"; color="#3182CE"; fontsize=14; fontcolor="#2B6CB0"; margin=18;
+    ui     [label="Terminal UI\nusername prompt, chat window"];
+    parser [label="Command parser\ntext, /msg, /quit, /help"];
+    recv   [label="Receiver thread\nshows messages instantly"];
+    {rank=same; ui; parser; recv}
+    ui -> parser;
+    parser -> recv [style=invis];
   }
 
-  proto [label="Message protocol  (protocol.py)\n4-byte length + JSON body, shared by both tiers\n#8, #17", fillcolor="#C6F6D5", shape=box];
-  net   [shape=cylinder, label="TCP connection\n(TLS encryption: #22, Sprint 2)", fillcolor="#FEFCBF", color="#B7791F"];
+  proto [label="Message protocol\n4-byte length + JSON, over TCP", fillcolor="#FEFCBF", color="#B7791F", width=3.2];
 
   subgraph cluster_server {
-    label="SERVER TIER  (server.py)"; style="rounded,filled"; fillcolor="#F0FFF4"; color="#38A169"; fontsize=14; fontcolor="#276749";
-    listen  [label="Connection listener\naccept() loop, TCP keepalive\n#1, #4", fillcolor="#C6F6D5"];
-    handler [label="Client handler threads\none per client, error isolation\n#1, #4, #17", fillcolor="#C6F6D5"];
-    disp    [label="Dispatcher\nroutes by message type,\nrejects unregistered sockets\n#21", fillcolor="#C6F6D5"];
-
-    subgraph cluster_core {
-      label="Chat management"; style="rounded,dashed"; color="#38A169"; fontsize=12; fontcolor="#276749";
-      reg    [label="Registration\nunique username\n#2", fillcolor="#C6F6D5"];
-      route  [label="Message router\nbroadcast + private /msg\n#3, #6", fillcolor="#C6F6D5"];
-      pres   [label="Presence\njoin/leave notices\n#5", fillcolor="#C6F6D5"];
-      groups [label="Group manager\ncreate/join/leave, history\n#15, #18", style="rounded,filled,dashed", fillcolor="#EDF2F7", fontcolor="#718096", color="#A0AEC0"];
-      users  [label="/users list\n#7", style="rounded,filled,dashed", fillcolor="#EDF2F7", fontcolor="#718096", color="#A0AEC0"];
-    }
-
-    store [shape=cylinder, label="Session registry  (registry.py)\nusername -> session, lock-protected\n#9", fillcolor="#E9D8FD", color="#805AD5"];
-
-    listen -> handler [label=" spawns"];
-    handler -> disp;
-    disp -> reg; disp -> route; disp -> pres;
-    disp -> groups [style=dashed, color="#A0AEC0"];
-    disp -> users  [style=dashed, color="#A0AEC0"];
-    reg -> store; route -> store; pres -> store;
+    label="SERVER"; style="rounded,filled"; fillcolor="#F0FFF4"; color="#38A169"; fontsize=14; fontcolor="#276749"; margin=18;
+    listen  [label="Connection listener\naccepts clients, keepalive"];
+    handler [label="Client handler threads\none per client, isolates errors"];
+    logic   [label="Chat logic\nregistration, broadcast,\nprivate messages, join/leave"];
+    store   [shape=cylinder, label="Session registry\nusername -> client,\nlock-protected", fillcolor="#E9D8FD", color="#805AD5"];
+    {rank=same; listen; handler; logic; store}
+    listen -> handler [label=" new thread"];
+    handler -> logic;
+    logic -> store;
   }
 
-  cfg [label="Config  (config.py)\n--host / --port, CHAT_HOST / CHAT_PORT\n#10", fillcolor="#C6F6D5"];
-  ci  [label="GitHub Actions CI\nflake8 + pytest on every push and PR\n#23", fillcolor="#C6F6D5"];
-
-  parser -> proto; recv -> proto [dir=back];
-  proto -> net [dir=both];
-  net -> listen [dir=both];
-  cfg -> cli [style=dotted, arrowhead=none, color="#A0AEC0"];
-  cfg -> listen [style=dotted, arrowhead=none, color="#A0AEC0"];
-  route -> handler [style=dashed, constraint=false, label=" delivers to\n recipient sockets"];
-  {rank=same; cfg; ci}
-  planned -> gui [style=invis];
+  parser -> proto [label=" send"];
+  proto -> recv  [label=" receive"];
+  proto -> listen [dir=both];
 }
