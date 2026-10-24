@@ -1,0 +1,61 @@
+// UML component diagram of the chat application.
+// Render: dot -Tpng components.dot -o ../Component_Diagram.png
+// Notation: box with tabs = <<component>>; circle = provided interface (lollipop);
+// dashed arrow = <<use>> (required interface); grey dashed = planned for Sprint 2.
+digraph Components {
+  graph [rankdir=TB, fontname="Helvetica", fontsize=20, labelloc=t, pad=0.5, nodesep=0.9, ranksep=0.7, bgcolor=white, newrank=true,
+         label="UML Component Diagram: Real-Time Chat Application\n "];
+  node  [shape=component, style=filled, fillcolor="#FFF2B3", fontname="Helvetica", fontsize=12, color="#222222", margin="0.25,0.12"];
+  edge  [fontname="Helvetica", fontsize=10, color="#222222"];
+
+  subgraph cluster_client {
+    label="<<subsystem>> Chat Client"; style="rounded"; color="#3182CE"; fontsize=14; fontcolor="#2B6CB0";
+    ClientApp [label="<<component>>\nClientApp\nclient.py"];
+    GUI       [label="<<component>>\nGUIClient\nplanned: Sprint 2, #16", style="filled,dashed", fillcolor="#F7FAFC", fontcolor="#718096", color="#A0AEC0"];
+  }
+
+  IChat [shape=circle, label="", width=0.25, fixedsize=true, fillcolor="#FFFFFF", xlabel="IChatService  "];
+
+  subgraph cluster_server {
+    label="<<subsystem>> Chat Server"; style="rounded"; color="#38A169"; fontsize=14; fontcolor="#276749";
+    Server   [label="<<component>>\nChatServer\nserver.py"];
+    Groups   [label="<<component>>\nGroupManager\nplanned: Sprint 2, #15", style="filled,dashed", fillcolor="#F7FAFC", fontcolor="#718096", color="#A0AEC0"];
+    ISession [shape=circle, label="", width=0.25, fixedsize=true, fillcolor="#FFFFFF", xlabel="ISessionStore  "];
+    Registry [label="<<component>>\nSessionRegistry\nregistry.py"];
+  }
+
+  subgraph cluster_shared {
+    label="<<library>> Shared (used by client and server)"; style="rounded"; color="#718096"; fontsize=14; fontcolor="#4A5568";
+    Protocol [label="<<component>>\nProtocol\nprotocol.py"];
+    IFraming [shape=circle, label="", width=0.25, fixedsize=true, fillcolor="#FFFFFF", xlabel="IMessageFraming  "];
+    Config   [label="<<component>>\nConfig\nconfig.py"];
+    IConfig  [shape=circle, label="", width=0.25, fixedsize=true, fillcolor="#FFFFFF", xlabel="IConfig  "];
+    Protocol -> IFraming [arrowhead=none, weight=10];
+    Config   -> IConfig  [arrowhead=none, weight=10];
+    IFraming -> Config   [style=invis];
+  }
+
+  // provided interfaces (lollipops)
+  IChat    -> Server   [arrowhead=none, weight=10];
+  ISession -> Registry [arrowhead=none, weight=10];
+
+  // required interfaces: <<use>>
+  ClientApp -> IChat    [style=dashed, arrowhead=open, weight=10, label="  <<use>>  framed JSON over TCP"];
+  GUI       -> IChat    [style=dashed, arrowhead=open, color="#A0AEC0"];
+  Server    -> ISession [style=dashed, arrowhead=open, weight=10, label="  <<use>>"];
+  Server    -> Groups   [style=dashed, arrowhead=open, color="#A0AEC0", constraint=false];
+  ClientApp -> IFraming [style=dashed, arrowhead=open, constraint=false];
+  Server    -> IFraming [style=dashed, arrowhead=open, constraint=false];
+  ClientApp -> IConfig  [style=dashed, arrowhead=open, constraint=false];
+  Server    -> IConfig  [style=dashed, arrowhead=open, constraint=false];
+
+  {rank=same; ClientApp; GUI; Protocol}
+  {rank=same; Server; Groups; Config}
+  {rank=same; ISession; IConfig}
+
+  // interface operations, shown as a UML note
+  note [shape=note, style=filled, fillcolor="#FFFFFF", color="#A0AEC0", fontsize=10, fontname="Helvetica", margin="0.15,0.1", label=
+"IChatService (TCP, default port 5000):\l  register(username), chat(text), private(to, text), quit\l\lISessionStore:\l  connect, register, get, disconnect, registered\l\lIMessageFraming:\l  send_message(sock, msg), recv_message(sock)\l\lIConfig:\l  parse_args() -> host, port\l"];
+  Registry -> note [style=invis];
+  {rank=same; Registry; note}
+}
