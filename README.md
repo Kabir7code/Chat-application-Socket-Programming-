@@ -51,6 +51,11 @@ python -m chat.client --host 192.168.1.20 --port 6000
 |---|---|
 | `any text` | Sends the message to everyone online |
 | `/msg <user> <text>` | Sends a private message that only `<user>` sees |
+| `/create <group>` | Creates a group; you become its admin |
+| `/join <group>` | Joins an existing group |
+| `/add <group> <user>` | Adds an online user to your group (admin only) |
+| `/g <group> <text>` | Sends a message to everyone in the group |
+| `/leave <group>` | Leaves the group |
 | `/quit` | Leaves the chat (others are told you left) |
 | `/help` | Shows the list of commands |
 
@@ -96,6 +101,33 @@ alice: hi everyone!
 
 Carol never sees Bob's private message, and the server keeps running after her client crashes.
 
+### Group chat
+
+Alice creates a group and adds Carol, Bob joins and later leaves. Every change shows the updated member list.
+
+**Alice**
+```
+/create Squad
+* [Squad] Group Squad created. You are the admin. (members: alice)
+* [Squad] bob joined Squad (members: alice, bob)
+/add Squad carol
+* [Squad] alice added carol to Squad (members: alice, bob, carol)
+[Squad] carol: thanks for adding me
+* [Squad] bob left Squad (members: alice, carol)
+```
+
+**Bob**
+```
+/join Squad
+* [Squad] bob joined Squad (members: alice, bob)
+/add Squad carol
+! Only the group admin can add members.
+/leave Squad
+* [Squad] You left Squad (members: alice, carol)
+```
+
+Group names are 1-30 letters, digits, underscores or hyphens. Only members can send to a group. If the admin leaves, the next member becomes admin, and an empty group is deleted.
+
 ## Project layout
 
 ```
@@ -103,6 +135,7 @@ chat/
   protocol.py   message framing: 4-byte length + JSON, shared by client and server
   server.py     multi-client server, one thread per client
   registry.py   thread-safe list of connected and registered users
+  groups.py     group chat: members, admin, create/join/add/leave
   client.py     terminal client and command parsing
   config.py     host/port settings
 tests/          automated tests (pytest)
@@ -113,6 +146,7 @@ Documents/      SRS, use-case diagram and flows, test cases
 
 - **Framing.** TCP is a byte stream, so every message is sent as a 4-byte length followed by a JSON body. Long or rapid messages always arrive whole and separate.
 - **Concurrency.** The server starts one thread per client. Shared state lives in a lock-protected registry, and each socket has its own send lock so two threads never write to it at once.
+- **Groups.** Group membership is kept on the server, so a group message is only ever sent to current members. Leaving or disconnecting removes you from every group.
 - **Registration first.** A socket must register a unique username before it can send anything.
 - **Failure isolation.** Bad input, crashes or a failed send on one client never affect anyone else. TCP keepalive detects clients that vanish without closing the connection.
 
