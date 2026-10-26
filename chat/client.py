@@ -1,10 +1,15 @@
 """Terminal chat client.
 
 Commands:
-    <text>               send to everyone
-    /msg <user> <text>   private message to one user
-    /quit                leave the chat
-    /help                show commands
+    <text>                 send to everyone
+    /msg <user> <text>     private message to one user
+    /create <group>        create a group (you become its admin)
+    /join <group>          join a group
+    /add <group> <user>    add someone to your group (admin only)
+    /leave <group>         leave a group
+    /g <group> <text>      message everyone in a group
+    /quit                  leave the chat
+    /help                  show commands
 """
 
 import socket
@@ -14,16 +19,36 @@ import threading
 from chat import config, protocol
 
 HELP = """Commands:
-  <text>               send to everyone
-  /msg <user> <text>   private message to one user
-  /quit                leave the chat
-  /help                show this help"""
+  <text>                 send to everyone
+  /msg <user> <text>     private message to one user
+  /create <group>        create a group (you become its admin)
+  /join <group>          join a group
+  /add <group> <user>    add someone to your group (admin only)
+  /leave <group>         leave a group
+  /g <group> <text>      message everyone in a group
+  /quit                  leave the chat
+  /help                  show this help"""
+
+# command -> (message type, field names, usage text). The last field takes
+# the rest of the line, so group messages can contain spaces.
+GROUP_COMMANDS = {
+    "/create": ("create_group", ["group"], "/create <group>"),
+    "/join": ("join_group", ["group"], "/join <group>"),
+    "/leave": ("leave_group", ["group"], "/leave <group>"),
+    "/add": ("add_member", ["group", "username"], "/add <group> <user>"),
+    "/g": ("group", ["group", "text"], "/g <group> <text>"),
+}
 
 
 def format_message(message):
     kind = message["type"]
+    if kind == "chat" and message.get("context") == "group":
+        return f"[{message['group']}] {message['from']}: {message['text']}"
     if kind == "chat":
         return f"{message['from']}: {message['text']}"
+    if kind == "group_update":
+        members = ", ".join(message["members"]) or "none"
+        return f"* [{message['group']}] {message['text']} (members: {members})"
     if kind == "private":
         return f"[private] {message['from']}: {message['text']}"
     if kind == "private_sent":
@@ -49,6 +74,12 @@ def parse_command(line):
         if not recipient or not text.strip():
             return None, "Usage: /msg <user> <text>"
         return {"type": "private", "to": recipient, "text": text}, None
+    if command in GROUP_COMMANDS:
+        kind, fields, usage = GROUP_COMMANDS[command]
+        parts = rest.strip().split(None, len(fields) - 1)
+        if len(parts) != len(fields) or not parts[-1].strip():
+            return None, f"Usage: {usage}"
+        return {"type": kind, **dict(zip(fields, parts))}, None
     if command == "/quit":
         return {"type": "quit"}, None
     if command == "/help":
