@@ -9,8 +9,10 @@ The receiver reads exactly 4 bytes, then exactly `length` bytes, so messages
 always arrive whole and separate (NFR-003).
 """
 
+import itertools
 import json
 import struct
+import threading
 
 HEADER = struct.Struct("!I")
 MAX_FRAME_BYTES = 64 * 1024  # largest message body we accept
@@ -77,6 +79,17 @@ def recv_message(sock):
     return decode(body)
 
 
+_ids = itertools.count(1)
+_ids_lock = threading.Lock()
+
+
+def new_message_id():
+    """Next message ID. IDs only go up, so they also show the order the
+    server handled messages in."""
+    with _ids_lock:
+        return next(_ids)
+
+
 def make_chat_message(text, sender):
     """Build the message a server delivers for a chat line (UT_07)."""
-    return {"type": "chat", "from": sender, "text": text}
+    return {"type": "chat", "id": new_message_id(), "from": sender, "text": text}

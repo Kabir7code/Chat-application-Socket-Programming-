@@ -67,19 +67,20 @@ def test_keepalive_is_enabled_on_client_sockets(server, connect):
 def test_private_message_reaches_only_the_recipient(server, connect):
     alice, bob, carol = connect("alice"), connect("bob"), connect("carol")
     alice.send({"type": "private", "to": "bob", "text": "secret"})
-    assert bob.recv_until("private") == {
-        "type": "private", "from": "alice", "to": "bob", "text": "secret",
-    }
+    message = bob.recv_until("private")
+    assert isinstance(message.pop("id"), int)
+    assert message == {"type": "private", "from": "alice", "to": "bob", "text": "secret"}
     carol.assert_silent()
 
 
 def test_sender_sees_confirmation(server, connect):
-    alice = connect("alice")
-    connect("bob")
+    alice, bob = connect("alice"), connect("bob")
     alice.send({"type": "private", "to": "bob", "text": "secret"})
-    assert alice.recv_until("private_sent") == {
-        "type": "private_sent", "to": "bob", "text": "secret",
-    }
+    received = bob.recv_until("private")
+    confirmation = alice.recv_until("private_sent")
+    assert confirmation["id"] == received["id"]  # same ID on both sides
+    del confirmation["id"]
+    assert confirmation == {"type": "private_sent", "to": "bob", "text": "secret"}
 
 
 def test_private_message_to_unknown_user(server, connect):

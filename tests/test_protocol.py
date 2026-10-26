@@ -80,8 +80,26 @@ def test_oversized_frame_is_rejected(pair):
 
 
 def test_make_chat_message():
-    assert protocol.make_chat_message("Hello there", "userA") == {
-        "type": "chat",
-        "from": "userA",
-        "text": "Hello there",
-    }
+    message = protocol.make_chat_message("Hello there", "userA")
+    assert isinstance(message.pop("id"), int)
+    assert message == {"type": "chat", "from": "userA", "text": "Hello there"}
+
+
+def test_message_ids_are_unique_and_increasing():
+    ids = [protocol.make_chat_message("x", "a")["id"] for _ in range(5)]
+    assert ids == sorted(set(ids))
+
+
+def test_message_ids_are_unique_across_threads():
+    ids = []
+
+    def make_many():
+        for _ in range(500):
+            ids.append(protocol.new_message_id())
+
+    threads = [threading.Thread(target=make_many) for _ in range(4)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    assert len(set(ids)) == 2000

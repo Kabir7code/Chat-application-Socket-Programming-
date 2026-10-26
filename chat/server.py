@@ -199,15 +199,17 @@ class ChatServer:
         if not self._valid_text(session, text):
             return
         recipient = self.registry.get(str(recipient_name))
+        message_id = protocol.new_message_id()
         if recipient is None or not recipient.send({
             "type": "private",
+            "id": message_id,
             "from": session.username,
             "to": recipient_name,
             "text": text,
         }):
             session.send(error_message("USER_NOT_FOUND", "User not found/offline"))
             return
-        session.send({"type": "private_sent", "to": recipient_name, "text": text})
+        session.send({"type": "private_sent", "id": message_id, "to": recipient_name, "text": text})
 
     def _broadcast(self, message, exclude=None):
         """Send to every registered user except `exclude`. A recipient whose
