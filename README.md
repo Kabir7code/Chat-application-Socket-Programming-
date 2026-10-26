@@ -6,22 +6,31 @@ A real-time client-server chat application built using Socket Programming that e
 
 - Python 3.10 or newer
 - No third-party packages are needed to run the app (standard library only)
+- The `openssl` command, once, to create the encryption certificate (included with macOS, Linux and Git for Windows)
 
 ## Running it
 
 Open one terminal for the server and one terminal per user.
 
-**1. Start the server**
+**1. Create the certificate (first time only)**
+
+```bash
+python -m chat.make_cert
+```
+
+This creates `certs/server.crt` and `certs/server.key`. All traffic between clients and the server is encrypted with TLS. The `certs/` folder is in `.gitignore`, so each machine makes its own.
+
+**2. Start the server**
 
 ```bash
 python -m chat.server
 ```
 
 ```
-Chat server listening on 127.0.0.1:5000
+Chat server listening on 127.0.0.1:5000 with TLS
 ```
 
-**2. Start a client in each other terminal**
+**3. Start a client in each other terminal**
 
 ```bash
 python -m chat.client
@@ -37,13 +46,23 @@ Both programs accept the same options. Command-line flags win over environment v
 |---|---|---|---|
 | Server address | `--host` | `CHAT_HOST` | `127.0.0.1` |
 | Server port | `--port` | `CHAT_PORT` | `5000` |
+| Server certificate | `--cert` | `CHAT_CERT` | `certs/server.crt` |
+| Server private key | `--key` | `CHAT_KEY` | `certs/server.key` |
+| Certificate the client trusts | `--cafile` | `CHAT_CAFILE` | `certs/server.crt` |
+| Turn encryption off (debugging only) | `--no-tls` | `CHAT_NO_TLS=1` | encryption on |
 
-To chat across machines on the same network, start the server with `--host 0.0.0.0` and point each client at the server machine's IP:
+To chat across machines on the same network, create the certificate for the server's IP, start the server with `--host 0.0.0.0`, and give each client a copy of `server.crt` (never the `.key`):
 
 ```bash
+# on the server machine (IP 192.168.1.20)
+python -m chat.make_cert --host 192.168.1.20
 python -m chat.server --host 0.0.0.0 --port 6000
-python -m chat.client --host 192.168.1.20 --port 6000
+
+# on each client machine, with server.crt copied over
+python -m chat.client --host 192.168.1.20 --port 6000 --cafile server.crt
 ```
+
+The client checks the server's certificate, so it will refuse to connect to a server that is not ours.
 
 ## Commands
 
@@ -137,7 +156,9 @@ chat/
   registry.py   thread-safe list of connected and registered users
   groups.py     group chat: members, admin, create/join/add/leave
   client.py     terminal client and command parsing
-  config.py     host/port settings
+  config.py     host, port and TLS settings
+  tls.py        TLS encryption for client and server sockets
+  make_cert.py  creates the self-signed server certificate
 tests/          automated tests (pytest)
 Documents/      SRS, use-case diagram and flows, test cases
 ```
@@ -147,6 +168,7 @@ Documents/      SRS, use-case diagram and flows, test cases
 - **Framing.** TCP is a byte stream, so every message is sent as a 4-byte length followed by a JSON body. Long or rapid messages always arrive whole and separate.
 - **Concurrency.** The server starts one thread per client. Shared state lives in a lock-protected registry, and each socket has its own send lock so two threads never write to it at once.
 - **Groups.** Group membership is kept on the server, so a group message is only ever sent to current members. Leaving or disconnecting removes you from every group.
+- **Encryption.** Every connection is wrapped in TLS (1.2 or newer). A test captures the raw network bytes during a chat and checks that no message text, usernames or JSON can be read from them.
 - **Registration first.** A socket must register a unique username before it can send anything.
 - **Failure isolation.** Bad input, crashes or a failed send on one client never affect anyone else. TCP keepalive detects clients that vanish without closing the connection.
 

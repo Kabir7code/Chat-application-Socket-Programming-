@@ -15,7 +15,7 @@ import threading
 import time
 import traceback
 
-from chat import config, protocol
+from chat import config, protocol, tls
 from chat.groups import GroupError, GroupManager
 from chat.registry import Session, SessionRegistry
 
@@ -50,9 +50,10 @@ def enable_keepalive(conn):
 
 
 class ChatServer:
-    def __init__(self, host=config.DEFAULT_HOST, port=config.DEFAULT_PORT):
+    def __init__(self, host=config.DEFAULT_HOST, port=config.DEFAULT_PORT, tls_context=None):
         self.host = host
         self.port = port
+        self.tls_context = tls_context  # None = unencrypted (tests, debugging)
         self.registry = SessionRegistry()
         self.groups = GroupManager()
         self._listener = None
@@ -81,7 +82,8 @@ class ChatServer:
 
     def serve_forever(self):
         self.start()
-        print(f"Chat server listening on {self.host}:{self.port}")
+        mode = "with TLS" if self.tls_context else "WITHOUT encryption"
+        print(f"Chat server listening on {self.host}:{self.port} {mode}")
         try:
             while self._running.is_set():
                 time.sleep(0.5)
@@ -111,6 +113,11 @@ class ChatServer:
 
     def _handle_client(self, session):
         try:
+            if self.tls_context is not None:
+                try:
+                    session.conn = tls.wrap_server_side(self.tls_context, session.conn)
+                except OSError:
+                    return  # failed or timed-out handshake; nothing was registered
             while session.alive:
                 try:
                     message = protocol.recv_message(session.conn)
@@ -294,7 +301,7 @@ GROUP_HANDLERS = {
 
 def main():
     args = config.parse_args("Run the chat server.")
-    ChatServer(args.host, args.port).serve_forever()
+    ChatServer(args.host, args.port, config.server_tls(args)).serve_forever()
 
 
 if __name__ == "__main__":

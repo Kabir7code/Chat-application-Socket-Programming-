@@ -3,3 +3,6 @@ __pycache__/
 .pytest_cache/
 .venv/
 venv/
+
+# TLS certificates: generate with python -m chat.make_cert, never commit
+certs/

@@ -12,11 +12,11 @@ Commands:
     /help                  show commands
 """
 
-import socket
+import ssl
 import sys
 import threading
 
-from chat import config, protocol
+from chat import config, protocol, tls
 
 HELP = """Commands:
   <text>                 send to everyone
@@ -121,7 +121,10 @@ def receive_loop(sock):
 def main():
     args = config.parse_args("Connect to the chat server.")
     try:
-        sock = socket.create_connection((args.host, args.port))
+        sock = tls.connect(args.host, args.port, config.client_tls(args))
+    except ssl.SSLCertVerificationError as exc:
+        sys.exit(f"Server certificate could not be verified ({exc.verify_message}). "
+                 "Check that --cafile is the server's certificate.")
     except OSError as exc:
         sys.exit(f"Could not connect to {args.host}:{args.port} ({exc})")
     try:
