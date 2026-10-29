@@ -2,8 +2,9 @@
 
 Every client must register a unique username first (FR-001, NFR-005). After
 that, chat lines are delivered in real time to everyone else (FR-003),
-private messages go to one user only (FR-005), and other users are told when
-someone joins or leaves (FR-006). A client that quits, crashes or sends bad
+private messages go to one user only (FR-005), group messages go only to the
+group's members (FR-004), and other users are told when someone joins or
+leaves (FR-006). A client that quits, crashes or sends bad
 data is cleaned up without affecting anyone else (FR-007, FR-008).
 """
 
@@ -14,7 +15,8 @@ import threading
 import time
 import traceback
 
-from chat import config, protocol
+from chat import config, protocol, tls
+from chat.groups import GroupError, GroupManager
 from chat.registry import Session, SessionRegistry
 
 USERNAME_PATTERN = re.compile(r"^[A-Za-z0-9_]{1,20}$")
@@ -48,10 +50,12 @@ def enable_keepalive(conn):
 
 
 class ChatServer:
-    def __init__(self, host=config.DEFAULT_HOST, port=config.DEFAULT_PORT):
+    def __init__(self, host=config.DEFAULT_HOST, port=config.DEFAULT_PORT, tls_context=None):
         self.host = host
         self.port = port
+        self.tls_context = tls_context  # None = unencrypted (tests, debugging)
         self.registry = SessionRegistry()
+        self.groups = GroupManager()
         self._listener = None
         self._running = threading.Event()
 
@@ -78,7 +82,8 @@ class ChatServer:
 
     def serve_forever(self):
         self.start()
-        print(f"Chat server listening on {self.host}:{self.port}")
+        mode = "with TLS" if self.tls_context else "WITHOUT encryption"
+        print(f"Chat server listening on {self.host}:{self.port} {mode}")
         try:
             while self._running.is_set():
                 time.sleep(0.5)
@@ -108,6 +113,11 @@ class ChatServer:
 
     def _handle_client(self, session):
         try:
+            if self.tls_context is not None:
+                try:
+                    session.conn = tls.wrap_server_side(self.tls_context, session.conn)
+                except OSError:
+                    return  # failed or timed-out handshake; nothing was registered
             while session.alive:
                 try:
                     message = protocol.recv_message(session.conn)
@@ -133,9 +143,10 @@ class ChatServer:
         was_registered = self.registry.disconnect(session)
         session.close()
         if was_registered:
-            self._broadcast(
-                system_message("leave", session.username, f"{session.username} left the chat")
-            )
+            name = session.username
+            for group, remaining in self.groups.remove_user(name).items():
+                self._group_update(remaining, "left", group, name, f"{name} left {group}")
+            self._broadcast(system_message("leave", name, f"{name} left the chat"))
 
     # ------------------------------------------------------------- features
     def _dispatch(self, session, message):
@@ -152,6 +163,11 @@ class ChatServer:
             self._deliver_chat(session, message.get("text"))
         elif kind == "private":
             self._deliver_private(session, message.get("to"), message.get("text"))
+        elif kind in GROUP_HANDLERS:
+            try:
+                GROUP_HANDLERS[kind](self, session, message)
+            except GroupError as exc:
+                session.send(error_message(exc.code, exc.message))
         else:
             session.send(error_message("UNKNOWN_TYPE", f"Unknown message type '{kind}'."))
 
@@ -211,6 +227,61 @@ class ChatServer:
             return
         session.send({"type": "private_sent", "id": message_id, "to": recipient_name, "text": text})
 
+    # --------------------------------------------------------- groups (FR-004)
+    def _create_group(self, session, message):
+        group = str(message.get("group", "")).strip()
+        members = self.groups.create(group, session.username)
+        self._group_update(members, "created", group, session.username,
+                           f"Group {group} created. You are the admin.")
+
+    def _join_group(self, session, message):
+        group = str(message.get("group", ""))
+        members = self.groups.join(group, session.username)
+        self._group_update(members, "joined", group, session.username,
+                           f"{session.username} joined {group}")
+
+    def _add_member(self, session, message):
+        group, user = str(message.get("group", "")), str(message.get("username", ""))
+        if self.registry.get(user) is None:
+            raise GroupError("USER_NOT_FOUND", "User not found/offline")
+        members = self.groups.add(group, session.username, user)
+        self._group_update(members, "added", group, user,
+                           f"{session.username} added {user} to {group}")
+
+    def _leave_group(self, session, message):
+        group = str(message.get("group", ""))
+        remaining = self.groups.leave(group, session.username)
+        session.send(self._group_update_message(remaining, "left", group, session.username,
+                                                f"You left {group}"))
+        self._group_update(remaining, "left", group, session.username,
+                           f"{session.username} left {group}")
+
+    def _deliver_group(self, session, message):
+        group, text = str(message.get("group", "")), message.get("text")
+        if not self.groups.is_member(group, session.username):
+            self.groups.members(group)  # raises GROUP_NOT_FOUND if it does not exist
+            raise GroupError("NOT_A_MEMBER", f"You are not a member of '{group}'.")
+        if not self._valid_text(session, text):
+            return
+        chat = protocol.make_chat_message(text, session.username)
+        chat.update(context="group", group=group)
+        self._send_to(self.groups.members(group), chat, exclude=session.username)
+
+    def _group_update_message(self, members, event, group, username, text):
+        return {"type": "group_update", "event": event, "group": group, "username": username,
+                "members": members, "text": text}
+
+    def _group_update(self, members, event, group, username, text):
+        """Tell every current member what changed, with the new member list."""
+        self._send_to(members, self._group_update_message(members, event, group, username, text))
+
+    def _send_to(self, usernames, message, exclude=None):
+        for name in usernames:
+            if name != exclude:
+                recipient = self.registry.get(name)
+                if recipient is not None:
+                    recipient.send(message)
+
     def _broadcast(self, message, exclude=None):
         """Send to every registered user except `exclude`. A recipient whose
         socket has failed is skipped; their own thread cleans them up."""
@@ -219,9 +290,18 @@ class ChatServer:
                 session.send(message)
 
 
+GROUP_HANDLERS = {
+    "create_group": ChatServer._create_group,
+    "join_group": ChatServer._join_group,
+    "add_member": ChatServer._add_member,
+    "leave_group": ChatServer._leave_group,
+    "group": ChatServer._deliver_group,
+}
+
+
 def main():
     args = config.parse_args("Run the chat server.")
-    ChatServer(args.host, args.port).serve_forever()
+    ChatServer(args.host, args.port, config.server_tls(args)).serve_forever()
 
 
 if __name__ == "__main__":
