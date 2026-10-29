@@ -1,0 +1,37 @@
+// Software architecture of the chat application (as built, Sprint 1).
+// Render: dot -Tpng -Gdpi=150 architecture.dot -o ../Architecture_Diagram.png
+digraph Architecture {
+  ordering=out;
+  graph [rankdir=TB, fontname="Helvetica", fontsize=20, labelloc=t, pad=0.5, nodesep=0.6, ranksep=0.7, bgcolor=white, newrank=true,
+         label="Software Architecture: Real-Time Chat Application\nClient-Server, one thread per client, framed JSON over TCP\n "];
+  node  [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12, color="#4A5568", fillcolor="#FFFFFF", margin="0.2,0.1", width=2.6, height=0.75];
+  edge  [fontname="Helvetica", fontsize=10, color="#4A5568", penwidth=1.2];
+
+  subgraph cluster_client {
+    label="CLIENT  (one per user)"; style="rounded,filled"; fillcolor="#EBF4FF"; color="#3182CE"; fontsize=14; fontcolor="#2B6CB0"; margin=18;
+    ui     [label="Terminal UI\nusername prompt, chat window"];
+    parser [label="Command parser\ntext, /msg, /quit, /help"];
+    recv   [label="Receiver thread\nshows messages instantly"];
+    {rank=same; ui; parser; recv}
+    ui -> parser;
+    parser -> recv [style=invis];
+  }
+
+  proto [label="Message protocol\n4-byte length + JSON, over TCP", fillcolor="#FEFCBF", color="#B7791F", width=3.2];
+
+  subgraph cluster_server {
+    label="SERVER"; style="rounded,filled"; fillcolor="#F0FFF4"; color="#38A169"; fontsize=14; fontcolor="#276749"; margin=18;
+    listen  [label="Connection listener\naccepts clients, keepalive"];
+    handler [label="Client handler threads\none per client, isolates errors"];
+    logic   [label="Chat logic\nregistration, broadcast,\nprivate messages, join/leave"];
+    store   [shape=cylinder, label="Session registry\nusername -> client,\nlock-protected", fillcolor="#E9D8FD", color="#805AD5"];
+    {rank=same; listen; handler; logic; store}
+    listen -> handler [label=" new thread"];
+    handler -> logic;
+    logic -> store;
+  }
+
+  parser -> proto [label=" send"];
+  proto -> recv  [label=" receive"];
+  proto -> listen [dir=both];
+}

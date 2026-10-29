@@ -1,0 +1,37 @@
+// UML component diagram of the chat application (as built, Sprint 1).
+// Render: dot -Tpng -Gdpi=150 components.dot -o ../Component_Diagram.png
+// Notation: box with tabs = component; circle = provided interface; dashed arrow = <<use>>.
+digraph Components {
+  graph [rankdir=LR, fontname="Helvetica", fontsize=20, labelloc=t, pad=0.5, nodesep=0.7, ranksep=1.0, bgcolor=white, newrank=true,
+         label="UML Component Diagram: Real-Time Chat Application\n "];
+  node  [shape=component, style=filled, fillcolor="#FFF2B3", fontname="Helvetica", fontsize=12, color="#222222", margin="0.25,0.12", width=1.9];
+  edge  [fontname="Helvetica", fontsize=10, color="#222222"];
+
+  ClientApp [label="<<component>>\nClientApp\nclient.py"];
+  IChat     [shape=circle, label="", width=0.25, fixedsize=true, fillcolor="#FFFFFF", xlabel="IChatService"];
+  Server    [label="<<component>>\nChatServer\nserver.py"];
+  ISession  [shape=circle, label="", width=0.25, fixedsize=true, fillcolor="#FFFFFF", xlabel="ISessionStore"];
+  Registry  [label="<<component>>\nSessionRegistry\nregistry.py"];
+
+  Protocol  [label="<<component>>\nProtocol\nprotocol.py"];
+  IFraming  [shape=circle, label="", width=0.25, fixedsize=true, fillcolor="#FFFFFF", xlabel="IMessageFraming"];
+  Config    [label="<<component>>\nConfig\nconfig.py"];
+  IConfig   [shape=circle, label="", width=0.25, fixedsize=true, fillcolor="#FFFFFF", xlabel="IConfig"];
+
+  // main row: client -> server -> registry
+  ClientApp -> IChat    [style=dashed, arrowhead=open, label="<<use>>\nTCP"];
+  IChat     -> Server   [arrowhead=none];
+  Server    -> ISession [style=dashed, arrowhead=open, label="<<use>>"];
+  ISession  -> Registry [arrowhead=none];
+
+  // shared library, used by client and server
+  IFraming -> Protocol [arrowhead=none];
+  IConfig  -> Config   [arrowhead=none];
+  ClientApp -> IFraming [style=dashed, arrowhead=open];
+  Server    -> IFraming [style=dashed, arrowhead=open, constraint=false];
+  ClientApp -> IConfig  [style=dashed, arrowhead=open];
+  Server    -> IConfig  [style=dashed, arrowhead=open, constraint=false];
+
+  {rank=same; IChat; IFraming; IConfig}
+  {rank=same; Server; Protocol; Config}
+}
