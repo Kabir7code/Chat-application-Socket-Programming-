@@ -215,17 +215,19 @@ class ChatServer:
         if not self._valid_text(session, text):
             return
         recipient = self.registry.get(str(recipient_name))
-        message_id = protocol.new_message_id()
+        message_id, sent_at = protocol.new_message_id(), protocol.timestamp()
         if recipient is None or not recipient.send({
             "type": "private",
             "id": message_id,
+            "time": sent_at,
             "from": session.username,
             "to": recipient_name,
             "text": text,
         }):
             session.send(error_message("USER_NOT_FOUND", "User not found/offline"))
             return
-        session.send({"type": "private_sent", "id": message_id, "to": recipient_name, "text": text})
+        session.send({"type": "private_sent", "id": message_id, "time": sent_at,
+                      "to": recipient_name, "text": text})
 
     # --------------------------------------------------------- groups (FR-004)
     def _create_group(self, session, message):

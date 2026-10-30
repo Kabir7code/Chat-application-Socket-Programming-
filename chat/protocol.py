@@ -10,6 +10,7 @@ always arrive whole and separate (NFR-003).
 """
 
 import itertools
+from datetime import datetime, timezone
 import json
 import struct
 import threading
@@ -90,6 +91,13 @@ def new_message_id():
         return next(_ids)
 
 
+def timestamp():
+    """FR-009 (#13): when the server handled a message, in UTC (ISO 8601).
+    Each client shows it in its own local time."""
+    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+
+
 def make_chat_message(text, sender):
-    """Build the message a server delivers for a chat line (UT_07)."""
-    return {"type": "chat", "id": new_message_id(), "from": sender, "text": text}
+    """Build the message a server delivers for a chat line (UT_07, FR-009)."""
+    return {"type": "chat", "id": new_message_id(), "time": timestamp(),
+            "from": sender, "text": text}
