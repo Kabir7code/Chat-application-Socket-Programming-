@@ -69,6 +69,7 @@ def test_private_message_reaches_only_the_recipient(server, connect):
     alice.send({"type": "private", "to": "bob", "text": "secret"})
     message = bob.recv_until("private")
     assert isinstance(message.pop("id"), int)
+    assert isinstance(message.pop("time"), str)  # FR-009
     assert message == {"type": "private", "from": "alice", "to": "bob", "text": "secret"}
     carol.assert_silent()
 
@@ -79,7 +80,8 @@ def test_sender_sees_confirmation(server, connect):
     received = bob.recv_until("private")
     confirmation = alice.recv_until("private_sent")
     assert confirmation["id"] == received["id"]  # same ID on both sides
-    del confirmation["id"]
+    assert confirmation["time"] == received["time"]  # and the same time (FR-009)
+    del confirmation["id"], confirmation["time"]
     assert confirmation == {"type": "private_sent", "to": "bob", "text": "secret"}
 
 

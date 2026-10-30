@@ -82,6 +82,7 @@ def test_oversized_frame_is_rejected(pair):
 def test_make_chat_message():
     message = protocol.make_chat_message("Hello there", "userA")
     assert isinstance(message.pop("id"), int)
+    assert isinstance(message.pop("time"), str)  # FR-009
     assert message == {"type": "chat", "from": "userA", "text": "Hello there"}
 
 
