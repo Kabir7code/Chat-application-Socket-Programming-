@@ -59,6 +59,7 @@ def test_message_carries_sender_name_and_context(server, connect):
     alice.send({"type": "chat", "text": "Hello there"})
     message = bob.recv_until("chat")
     assert isinstance(message.pop("id"), int)
+    assert isinstance(message.pop("time"), str)  # FR-009
     assert message == {
         "type": "chat",
         "from": "alice",
