@@ -75,8 +75,11 @@ The client checks the server's certificate, so it will refuse to connect to a se
 | `/add <group> <user>` | Adds an online user to your group (admin only) |
 | `/g <group> <text>` | Sends a message to everyone in the group |
 | `/leave <group>` | Leaves the group |
+| `/users` | Lists everyone who is online |
 | `/quit` | Leaves the chat (others are told you left) |
 | `/help` | Shows the list of commands |
+
+Every chat, group and private message is shown with the time it was sent, in your own local time, e.g. `[14:05] alice: hi`.
 
 ## Sample session
 
