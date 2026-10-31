@@ -247,6 +247,7 @@ class ChatServer:
         members = self.groups.join(group, session.username)
         self._group_update(members, "joined", group, session.username,
                            f"{session.username} joined {group}")
+        self._send_history(session, group)
 
     def _add_member(self, session, message):
         group, user = str(message.get("group", "")), str(message.get("username", ""))
@@ -255,6 +256,9 @@ class ChatServer:
         members = self.groups.add(group, session.username, user)
         self._group_update(members, "added", group, user,
                            f"{session.username} added {user} to {group}")
+        added = self.registry.get(user)
+        if added is not None:
+            self._send_history(added, group)
 
     def _leave_group(self, session, message):
         group = str(message.get("group", ""))
@@ -273,7 +277,15 @@ class ChatServer:
             return
         chat = protocol.make_chat_message(text, session.username)
         chat.update(context="group", group=group)
-        self._send_to(self.groups.members(group), chat, exclude=session.username)
+        with self._delivery_lock:  # history keeps the same order everyone saw (#31)
+            self.groups.record(group, chat)
+            self._send_to(self.groups.members(group), chat, exclude=session.username)
+
+    def _send_history(self, session, group):
+        """FR-010 (#18): show a new member the group's recent messages."""
+        for message in self.groups.history(group):
+            message["history"] = True
+            session.send(message)
 
     def _group_update_message(self, members, event, group, username, text):
         return {"type": "group_update", "event": event, "group": group, "username": username,
