@@ -4,7 +4,7 @@ Every client must register a unique username first (FR-001, NFR-005). After
 that, chat lines are delivered in real time to everyone else (FR-003),
 private messages go to one user only (FR-005), group messages go only to the
 group's members (FR-004), and other users are told when someone joins or
-leaves (FR-006); /users lists who is online (#7). A client that quits, crashes or sends bad
+leaves (FR-006). A client that quits, crashes or sends bad
 data is cleaned up without affecting anyone else (FR-007, FR-008).
 """
 
@@ -56,6 +56,10 @@ class ChatServer:
         self.tls_context = tls_context  # None = unencrypted (tests, debugging)
         self.registry = SessionRegistry()
         self.groups = GroupManager()
+        # IT_08 (#31): one message is handed to all of its recipients before
+        # the next one starts, so everyone sees messages in the same order.
+        # Re-entrant because a group update can be sent while already holding it.
+        self._delivery_lock = threading.RLock()
         self._listener = None
         self._running = threading.Event()
 
@@ -163,8 +167,6 @@ class ChatServer:
             self._deliver_chat(session, message.get("text"))
         elif kind == "private":
             self._deliver_private(session, message.get("to"), message.get("text"))
-        elif kind == "list_users":  # FR-006 (#7)
-            session.send({"type": "users", "users": self.registry.usernames()})
         elif kind in GROUP_HANDLERS:
             try:
                 GROUP_HANDLERS[kind](self, session, message)
@@ -217,19 +219,17 @@ class ChatServer:
         if not self._valid_text(session, text):
             return
         recipient = self.registry.get(str(recipient_name))
-        message_id, sent_at = protocol.new_message_id(), protocol.timestamp()
+        message_id = protocol.new_message_id()
         if recipient is None or not recipient.send({
             "type": "private",
             "id": message_id,
-            "time": sent_at,
             "from": session.username,
             "to": recipient_name,
             "text": text,
         }):
             session.send(error_message("USER_NOT_FOUND", "User not found/offline"))
             return
-        session.send({"type": "private_sent", "id": message_id, "time": sent_at,
-                      "to": recipient_name, "text": text})
+        session.send({"type": "private_sent", "id": message_id, "to": recipient_name, "text": text})
 
     # --------------------------------------------------------- groups (FR-004)
     def _create_group(self, session, message):
@@ -280,18 +280,22 @@ class ChatServer:
         self._send_to(members, self._group_update_message(members, event, group, username, text))
 
     def _send_to(self, usernames, message, exclude=None):
-        for name in usernames:
-            if name != exclude:
-                recipient = self.registry.get(name)
-                if recipient is not None:
-                    recipient.send(message)
+        with self._delivery_lock:
+            for name in usernames:
+                if name != exclude:
+                    recipient = self.registry.get(name)
+                    if recipient is not None:
+                        recipient.send(message)
 
     def _broadcast(self, message, exclude=None):
         """Send to every registered user except `exclude`. A recipient whose
-        socket has failed is skipped; their own thread cleans them up."""
-        for session in self.registry.registered():
-            if session is not exclude:
-                session.send(message)
+        socket has failed is skipped; their own thread cleans them up.
+
+        Held under the delivery lock so two broadcasts never interleave (#31)."""
+        with self._delivery_lock:
+            for session in self.registry.registered():
+                if session is not exclude:
+                    session.send(message)
 
 
 GROUP_HANDLERS = {
