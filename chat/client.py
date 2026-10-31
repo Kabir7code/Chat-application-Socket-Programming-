@@ -8,6 +8,7 @@ Commands:
     /add <group> <user>    add someone to your group (admin only)
     /leave <group>         leave a group
     /g <group> <text>      message everyone in a group
+    /users                 list who is online
     /quit                  leave the chat
     /help                  show commands
 """
@@ -27,6 +28,7 @@ HELP = """Commands:
   /add <group> <user>    add someone to your group (admin only)
   /leave <group>         leave a group
   /g <group> <text>      message everyone in a group
+  /users                 list who is online
   /quit                  leave the chat
   /help                  show this help"""
 
@@ -65,6 +67,9 @@ def format_message(message):
         return f"{when}[private] {message['from']}: {message['text']}"
     if kind == "private_sent":
         return f"{when}[private to {message['to']}] {message['text']}"
+    if kind == "users":
+        names = message["users"]
+        return f"* Online ({len(names)}): {', '.join(names)}"
     if kind == "system":
         return f"* {message['text']}"
     if kind == "error":
@@ -92,6 +97,8 @@ def parse_command(line):
         if len(parts) != len(fields) or not parts[-1].strip():
             return None, f"Usage: {usage}"
         return {"type": kind, **dict(zip(fields, parts))}, None
+    if command == "/users":
+        return {"type": "list_users"}, None
     if command == "/quit":
         return {"type": "quit"}, None
     if command == "/help":

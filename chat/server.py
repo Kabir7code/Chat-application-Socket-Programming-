@@ -4,7 +4,7 @@ Every client must register a unique username first (FR-001, NFR-005). After
 that, chat lines are delivered in real time to everyone else (FR-003),
 private messages go to one user only (FR-005), group messages go only to the
 group's members (FR-004), and other users are told when someone joins or
-leaves (FR-006). A client that quits, crashes or sends bad
+leaves (FR-006); /users lists who is online (#7). A client that quits, crashes or sends bad
 data is cleaned up without affecting anyone else (FR-007, FR-008).
 """
 
@@ -163,6 +163,8 @@ class ChatServer:
             self._deliver_chat(session, message.get("text"))
         elif kind == "private":
             self._deliver_private(session, message.get("to"), message.get("text"))
+        elif kind == "list_users":  # FR-006 (#7)
+            session.send({"type": "users", "users": self.registry.usernames()})
         elif kind in GROUP_HANDLERS:
             try:
                 GROUP_HANDLERS[kind](self, session, message)
