@@ -15,6 +15,7 @@ Commands:
 import ssl
 import sys
 import threading
+from datetime import datetime
 
 from chat import config, protocol, tls
 
@@ -40,19 +41,30 @@ GROUP_COMMANDS = {
 }
 
 
+def time_prefix(message):
+    """FR-009 (#13): "[14:05] " in the reader's local time, or "" if the
+    message has no time (or a time we cannot read)."""
+    try:
+        sent = datetime.fromisoformat(message["time"]).astimezone()
+    except (KeyError, TypeError, ValueError):
+        return ""
+    return sent.strftime("[%H:%M] ")
+
+
 def format_message(message):
     kind = message["type"]
+    when = time_prefix(message)
     if kind == "chat" and message.get("context") == "group":
-        return f"[{message['group']}] {message['from']}: {message['text']}"
+        return f"{when}[{message['group']}] {message['from']}: {message['text']}"
     if kind == "chat":
-        return f"{message['from']}: {message['text']}"
+        return f"{when}{message['from']}: {message['text']}"
     if kind == "group_update":
         members = ", ".join(message["members"]) or "none"
         return f"* [{message['group']}] {message['text']} (members: {members})"
     if kind == "private":
-        return f"[private] {message['from']}: {message['text']}"
+        return f"{when}[private] {message['from']}: {message['text']}"
     if kind == "private_sent":
-        return f"[private to {message['to']}] {message['text']}"
+        return f"{when}[private to {message['to']}] {message['text']}"
     if kind == "system":
         return f"* {message['text']}"
     if kind == "error":
