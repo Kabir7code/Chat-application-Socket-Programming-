@@ -56,6 +56,10 @@ class ChatServer:
         self.tls_context = tls_context  # None = unencrypted (tests, debugging)
         self.registry = SessionRegistry()
         self.groups = GroupManager()
+        # IT_08 (#31): one message is handed to all of its recipients before
+        # the next one starts, so everyone sees messages in the same order.
+        # Re-entrant because a group update can be sent while already holding it.
+        self._delivery_lock = threading.RLock()
         self._listener = None
         self._running = threading.Event()
 
@@ -243,6 +247,7 @@ class ChatServer:
         members = self.groups.join(group, session.username)
         self._group_update(members, "joined", group, session.username,
                            f"{session.username} joined {group}")
+        self._send_history(session, group)
 
     def _add_member(self, session, message):
         group, user = str(message.get("group", "")), str(message.get("username", ""))
@@ -251,6 +256,9 @@ class ChatServer:
         members = self.groups.add(group, session.username, user)
         self._group_update(members, "added", group, user,
                            f"{session.username} added {user} to {group}")
+        added = self.registry.get(user)
+        if added is not None:
+            self._send_history(added, group)
 
     def _leave_group(self, session, message):
         group = str(message.get("group", ""))
@@ -269,7 +277,15 @@ class ChatServer:
             return
         chat = protocol.make_chat_message(text, session.username)
         chat.update(context="group", group=group)
-        self._send_to(self.groups.members(group), chat, exclude=session.username)
+        with self._delivery_lock:  # history keeps the same order everyone saw (#31)
+            self.groups.record(group, chat)
+            self._send_to(self.groups.members(group), chat, exclude=session.username)
+
+    def _send_history(self, session, group):
+        """FR-010 (#18): show a new member the group's recent messages."""
+        for message in self.groups.history(group):
+            message["history"] = True
+            session.send(message)
 
     def _group_update_message(self, members, event, group, username, text):
         return {"type": "group_update", "event": event, "group": group, "username": username,
@@ -280,18 +296,22 @@ class ChatServer:
         self._send_to(members, self._group_update_message(members, event, group, username, text))
 
     def _send_to(self, usernames, message, exclude=None):
-        for name in usernames:
-            if name != exclude:
-                recipient = self.registry.get(name)
-                if recipient is not None:
-                    recipient.send(message)
+        with self._delivery_lock:
+            for name in usernames:
+                if name != exclude:
+                    recipient = self.registry.get(name)
+                    if recipient is not None:
+                        recipient.send(message)
 
     def _broadcast(self, message, exclude=None):
         """Send to every registered user except `exclude`. A recipient whose
-        socket has failed is skipped; their own thread cleans them up."""
-        for session in self.registry.registered():
-            if session is not exclude:
-                session.send(message)
+        socket has failed is skipped; their own thread cleans them up.
+
+        Held under the delivery lock so two broadcasts never interleave (#31)."""
+        with self._delivery_lock:
+            for session in self.registry.registered():
+                if session is not exclude:
+                    session.send(message)
 
 
 GROUP_HANDLERS = {
