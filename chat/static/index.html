@@ -9,56 +9,95 @@
 <body>
   <section id="join-screen" class="join">
     <form id="join-form" class="join-card">
-      <h1>Chat</h1>
-      <label for="username">Choose a username</label>
-      <input id="username" autocomplete="off" maxlength="20" autofocus>
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.4 3.8c-.6.5-1.6.1-1.6-.8V5.5Z"/></svg>
+      </div>
+      <h1>Welcome to Chat</h1>
+      <p class="hint">Pick a name to start talking.</p>
+      <label for="username">Username</label>
+      <input id="username" autocomplete="off" maxlength="20" autofocus placeholder="e.g. alice">
       <p class="hint">1-20 letters, digits or underscores</p>
       <p id="join-error" class="error-text" role="alert"></p>
       <button type="submit" class="primary">Join</button>
     </form>
   </section>
 
-  <section id="chat-screen" class="chat" hidden>
-    <header class="top">
-      <strong id="me"></strong>
-      <span id="security" class="badge"></span>
-      <span id="status" class="error-text" role="alert"></span>
-      <button id="leave" type="button">Leave</button>
-    </header>
+  <section id="chat-screen" class="app" hidden>
+    <!-- Left: my profile and the list of chats -->
+    <aside class="sidebar">
+      <header class="sidebar-top">
+        <div id="my-avatar" class="avatar"></div>
+        <div class="who">
+          <strong id="me"></strong>
+          <span id="security" class="security"></span>
+        </div>
+        <button id="new-group-toggle" type="button" class="icon-button" title="New group" aria-label="New group" aria-expanded="false">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <button id="leave" type="button" class="icon-button" title="Leave chat" aria-label="Leave chat">
+          <svg viewBox="0 0 24 24"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 8l-4 4 4 4M6 12h10"/></svg>
+        </button>
+      </header>
 
-    <aside class="panel">
-      <h2>Online</h2>
-      <ul id="online" class="names"></ul>
-      <h2>My groups</h2>
-      <ul id="my-groups" class="names"></ul>
+      <form id="new-group" class="new-group" hidden>
+        <label for="group-name">Create or join a group</label>
+        <input id="group-name" autocomplete="off" maxlength="30" placeholder="Group name">
+        <div class="buttons">
+          <button id="create-group" type="button" class="primary">Create</button>
+          <button id="join-group" type="button">Join</button>
+        </div>
+      </form>
+
+      <div class="search">
+        <input id="search" type="search" autocomplete="off" placeholder="Search chats" aria-label="Search chats">
+      </div>
+      <ul id="chats" class="chats"></ul>
     </aside>
 
-    <main class="centre">
+    <!-- Middle: the open conversation -->
+    <main class="conversation">
+      <header class="chat-top">
+        <button id="back" type="button" class="icon-button back" aria-label="Back to chats">
+          <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <button id="chat-title" type="button" class="chat-title" title="Chat info">
+          <span id="chat-avatar" class="avatar"></span>
+          <span class="who">
+            <strong id="chat-name"></strong>
+            <span id="chat-subtitle" class="subtitle"></span>
+          </span>
+        </button>
+      </header>
+      <p id="status" class="banner" role="alert" hidden></p>
       <ol id="messages" class="messages" aria-live="polite"></ol>
       <form id="send-form" class="composer">
-        <label for="target">Send to</label>
-        <select id="target"></select>
-        <input id="text" autocomplete="off" aria-label="Message" placeholder="Type a message or /help">
-        <button type="submit" class="primary">Send</button>
+        <input id="text" autocomplete="off" aria-label="Message" placeholder="Type a message, or /help for commands">
+        <button type="submit" class="send" title="Send" aria-label="Send">
+          <svg viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-2.5-6.5L4 12Z"/></svg>
+        </button>
       </form>
     </main>
 
-    <aside class="panel">
-      <h2>Groups</h2>
-      <label for="group-name">Group name</label>
-      <input id="group-name" autocomplete="off" maxlength="30">
-      <div class="buttons">
-        <button id="create-group" type="button">Create</button>
-        <button id="join-group" type="button">Join</button>
-        <button id="leave-group" type="button">Leave</button>
+    <!-- Right: details of the open chat, opened from the chat header -->
+    <aside id="info" class="info" hidden>
+      <header class="info-top">
+        <strong>Chat info</strong>
+        <button id="info-close" type="button" class="icon-button" aria-label="Close chat info">
+          <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </header>
+      <div id="info-avatar" class="avatar large"></div>
+      <strong id="info-name" class="info-name"></strong>
+      <div id="group-actions" hidden>
+        <label for="member-name">Add member (admin only)</label>
+        <div class="add-row">
+          <input id="member-name" autocomplete="off" maxlength="20" placeholder="Username">
+          <button id="add-member" type="button">Add</button>
+        </div>
       </div>
-      <label for="member-name">Add member (admin only)</label>
-      <input id="member-name" autocomplete="off" maxlength="20">
-      <div class="buttons">
-        <button id="add-member" type="button">Add member</button>
-      </div>
-      <h2 id="members-title">Members</h2>
-      <ul id="members" class="names"></ul>
+      <h2 id="members-title"></h2>
+      <ul id="members" class="members"></ul>
+      <button id="leave-group" type="button" class="danger" hidden>Leave group</button>
     </aside>
   </section>
 
