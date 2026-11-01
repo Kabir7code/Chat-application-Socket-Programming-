@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chat</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <section id="join-screen" class="join">
+    <form id="join-form" class="join-card">
+      <h1>Chat</h1>
+      <label for="username">Choose a username</label>
+      <input id="username" autocomplete="off" maxlength="20" autofocus>
+      <p class="hint">1-20 letters, digits or underscores</p>
+      <p id="join-error" class="error-text" role="alert"></p>
+      <button type="submit" class="primary">Join</button>
+    </form>
+  </section>
+
+  <section id="chat-screen" class="chat" hidden>
+    <header class="top">
+      <strong id="me"></strong>
+      <span id="security" class="badge"></span>
+      <span id="status" class="error-text" role="alert"></span>
+      <button id="leave" type="button">Leave</button>
+    </header>
+
+    <aside class="panel">
+      <h2>Online</h2>
+      <ul id="online" class="names"></ul>
+      <h2>My groups</h2>
+      <ul id="my-groups" class="names"></ul>
+    </aside>
+
+    <main class="centre">
+      <ol id="messages" class="messages" aria-live="polite"></ol>
+      <form id="send-form" class="composer">
+        <label for="target">Send to</label>
+        <select id="target"></select>
+        <input id="text" autocomplete="off" aria-label="Message" placeholder="Type a message or /help">
+        <button type="submit" class="primary">Send</button>
+      </form>
+    </main>
+
+    <aside class="panel">
+      <h2>Groups</h2>
+      <label for="group-name">Group name</label>
+      <input id="group-name" autocomplete="off" maxlength="30">
+      <div class="buttons">
+        <button id="create-group" type="button">Create</button>
+        <button id="join-group" type="button">Join</button>
+        <button id="leave-group" type="button">Leave</button>
+      </div>
+      <label for="member-name">Add member (admin only)</label>
+      <input id="member-name" autocomplete="off" maxlength="20">
+      <div class="buttons">
+        <button id="add-member" type="button">Add member</button>
+      </div>
+      <h2 id="members-title">Members</h2>
+      <ul id="members" class="names"></ul>
+    </aside>
+  </section>
+
+  <script src="/app.js"></script>
+</body>
+</html>
