@@ -8,16 +8,22 @@ leaves (FR-006); /users lists who is online (#7). A client that quits, crashes o
 data is cleaned up without affecting anyone else (FR-007, FR-008).
 """
 
+import logging
+import os
 import re
 import socket
-import sys
 import threading
 import time
-import traceback
 
 from chat import config, protocol, tls
 from chat.groups import GroupError, GroupManager
 from chat.registry import Session, SessionRegistry
+
+# NFR-004 (#14): the server reports what it is doing through the standard
+# logging module instead of print(), so messages get a time and a level and
+# can be turned up or down with CHAT_LOG_LEVEL (DEBUG, INFO, WARNING, ERROR).
+log = logging.getLogger("chat.server")
+LOG_FORMAT = "%(asctime)s %(levelname)-7s %(message)s"
 
 USERNAME_PATTERN = re.compile(r"^[A-Za-z0-9_]{1,20}$")
 MAX_TEXT_LENGTH = 4000
@@ -87,12 +93,12 @@ class ChatServer:
     def serve_forever(self):
         self.start()
         mode = "with TLS" if self.tls_context else "WITHOUT encryption"
-        print(f"Chat server listening on {self.host}:{self.port} {mode}")
+        log.info("Chat server listening on %s:%s %s", self.host, self.port, mode)
         try:
             while self._running.is_set():
                 time.sleep(0.5)
         except KeyboardInterrupt:
-            print("\nShutting down.")
+            log.info("Shutting down.")
         finally:
             self.stop()
 
@@ -107,9 +113,10 @@ class ChatServer:
     def _accept_loop(self):
         while self._running.is_set():
             try:
-                conn, _addr = self._listener.accept()
+                conn, addr = self._listener.accept()
             except OSError:
                 break  # listener closed
+            log.info("Connection from %s:%s", *addr[:2])
             enable_keepalive(conn)
             session = Session(conn)
             self.registry.connect(session)
@@ -120,12 +127,14 @@ class ChatServer:
             if self.tls_context is not None:
                 try:
                     session.conn = tls.wrap_server_side(self.tls_context, session.conn)
-                except OSError:
+                except OSError as exc:
+                    log.warning("TLS handshake failed: %s", exc)
                     return  # failed or timed-out handshake; nothing was registered
             while session.alive:
                 try:
                     message = protocol.recv_message(session.conn)
                 except protocol.FrameError:
+                    log.warning("Broken frame from %s; disconnecting", session.username or "?")
                     session.send(error_message("MALFORMED", "Invalid frame; disconnecting."))
                     break  # stream is out of sync, cannot continue
                 except protocol.ProtocolError:
@@ -138,7 +147,8 @@ class ChatServer:
                 try:
                     self._dispatch(session, message)
                 except Exception:  # one bad message must not kill the session (FR-008)
-                    traceback.print_exc(file=sys.stderr)
+                    log.exception("Error handling %r from %s", message.get("type"),
+                                  session.username or "?")
                     session.send(error_message("SERVER_ERROR", "Could not process message."))
         finally:
             self._disconnect(session)
@@ -148,6 +158,7 @@ class ChatServer:
         session.close()
         if was_registered:
             name = session.username
+            log.info("%s left", name)
             for group, remaining in self.groups.remove_user(name).items():
                 self._group_update(remaining, "left", group, name, f"{name} left {group}")
             self._broadcast(system_message("leave", name, f"{name} left the chat"))
@@ -188,6 +199,7 @@ class ChatServer:
         if not self.registry.register(session, username):
             session.send(error_message("USERNAME_TAKEN", "Username already taken."))
             return
+        log.info("%s registered", username)
         session.send({
             "type": "registered",
             "username": username,
@@ -323,7 +335,14 @@ GROUP_HANDLERS = {
 }
 
 
+def setup_logging():
+    """Send log messages to the terminal. Level comes from CHAT_LOG_LEVEL."""
+    level = os.environ.get("CHAT_LOG_LEVEL", "INFO").upper()
+    logging.basicConfig(level=getattr(logging, level, logging.INFO), format=LOG_FORMAT)
+
+
 def main():
+    setup_logging()
     args = config.parse_args("Run the chat server.")
     ChatServer(args.host, args.port, config.server_tls(args)).serve_forever()
 
