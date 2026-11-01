@@ -81,6 +81,27 @@ The client checks the server's certificate, so it will refuse to connect to a se
 
 Every chat, group and private message is shown with the time it was sent, in your own local time, e.g. `[14:05] alice: hi`.
 
+## Web UI (localhost)
+
+Everything above also works from a browser: join, broadcast, private messages, groups with admin and "(earlier)" history, `/users`, every slash command, timestamps and join/leave notices.
+
+A browser cannot open a raw socket, so `chat.web` is a small gateway that gives each browser tab one normal chat connection. It needs nothing beyond Python.
+
+```bash
+# first time only
+python -m chat.make_cert
+
+# terminal 1: the chat server
+python -m chat.server
+
+# terminal 2: the web gateway
+python -m chat.web
+```
+
+Then open <http://localhost:8080> in your browser, with one tab per user. `--web-port` changes the page's port, and `--host`, `--port`, `--cafile` and `--no-tls` work as they do for the terminal client.
+
+The gateway only accepts connections from this machine unless you pass `--web-host 0.0.0.0`. If you do, anyone on the network can open the page, and traffic between their browser and the gateway is not encrypted: "Encrypted (TLS)" in the page header describes the link from the gateway to the chat server.
+
 ## Sample session
 
 Three users, recorded from a real run. Bob first tries a name that is taken, sends Alice a private message and quits; Carol messages a user who does not exist, then her client is killed to simulate a crash.
@@ -162,6 +183,8 @@ chat/
   config.py     host, port and TLS settings
   tls.py        TLS encryption for client and server sockets
   make_cert.py  creates the self-signed server certificate
+  web.py        web gateway: lets a browser use the chat (python -m chat.web)
+  static/       the web page: index.html, app.js, style.css
 tests/          automated tests (pytest)
 Documents/      SRS, use-case diagram and flows, test cases
 ```
