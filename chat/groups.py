@@ -1,7 +1,8 @@
 """Group chat state (FR-004): which groups exist and who is in them.
 
-Kept separate from the server so the rules can be tested on their own and
-so group history (#18) can be added here later. Every method takes the same
+Kept separate from the server so the rules can be tested on their own.
+Each group also keeps its last HISTORY_SIZE messages, which are shown to
+anyone who joins or is added later (FR-010, #18). Every method takes the same
 lock, because many client threads create, join and leave groups at once.
 Methods return copies of member lists, so callers can send messages after
 the lock is released.
@@ -9,8 +10,10 @@ the lock is released.
 
 import re
 import threading
+from collections import deque
 
 GROUP_NAME_PATTERN = re.compile(r"^[A-Za-z0-9_-]{1,30}$")
+HISTORY_SIZE = 10  # recent messages kept per group (FR-010)
 
 
 class GroupError(Exception):
@@ -28,6 +31,7 @@ class Group:
         self.name = name
         self.admin = admin
         self.members = [admin]  # in joining order; the admin is first
+        self.history = deque(maxlen=HISTORY_SIZE)  # oldest first; old ones drop off
 
 
 class GroupManager:
@@ -108,6 +112,20 @@ class GroupManager:
         elif group.admin == user:
             group.admin = group.members[0]
         return list(group.members)
+
+    # ----------------------------------------------------------- history
+    def record(self, name, message):
+        """FR-010: remember a group message for people who join later."""
+        with self._lock:
+            group = self._groups.get(name)
+            if group is not None:
+                group.history.append(dict(message))
+
+    def history(self, name):
+        """The group's recent messages, oldest first (copies)."""
+        with self._lock:
+            group = self._groups.get(name)
+            return [dict(m) for m in group.history] if group else []
 
     # ------------------------------------------------------------ queries
     def members(self, name):

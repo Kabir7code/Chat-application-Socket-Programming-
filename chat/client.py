@@ -57,7 +57,8 @@ def format_message(message):
     kind = message["type"]
     when = time_prefix(message)
     if kind == "chat" and message.get("context") == "group":
-        return f"{when}[{message['group']}] {message['from']}: {message['text']}"
+        earlier = " (earlier)" if message.get("history") else ""
+        return f"{when}[{message['group']}]{earlier} {message['from']}: {message['text']}"
     if kind == "chat":
         return f"{when}{message['from']}: {message['text']}"
     if kind == "group_update":
