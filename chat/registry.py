@@ -6,6 +6,7 @@ username at the same moment, or two threads could write to one socket at
 once and interleave their bytes.
 """
 
+import socket
 import threading
 
 from chat import protocol
@@ -34,6 +35,13 @@ class Session:
 
     def close(self):
         self.alive = False
+        try:
+            # shutdown() first: on Linux, close() alone does not wake up the
+            # thread blocked reading this socket, so the client is never told
+            # the connection ended (e.g. when the server is stopped).
+            self.conn.shutdown(socket.SHUT_RDWR)
+        except OSError:
+            pass
         try:
             self.conn.close()
         except OSError:
