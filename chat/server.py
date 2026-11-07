@@ -66,11 +66,12 @@ class ChatServer:
         self.port = port
         self.tls_context = tls_context  # None = unencrypted (tests, debugging)
         self.registry = SessionRegistry()
-        self.groups = GroupManager()
         # FR-011 (#50): every delivered message is saved here. The default
         # ":memory:" database is thrown away on exit (tests); pass a file
         # path for messages that survive a restart.
         self.store = MessageStore(db_path)
+        # FR-013 (#51): groups are saved in the same database and loaded again here.
+        self.groups = GroupManager(self.store)
         # IT_08 (#31): one message is handed to all of its recipients before
         # the next one starts, so everyone sees messages in the same order.
         # Re-entrant because a group update can be sent while already holding it.
@@ -169,8 +170,12 @@ class ChatServer:
         if was_registered:
             name = session.username
             log.info("%s left", name)
-            for group, remaining in self.groups.remove_user(name).items():
-                self._group_update(remaining, "left", group, name, f"{name} left {group}")
+            # FR-013 (#51): when the server itself is stopping, everyone is
+            # disconnected at once; keep their group memberships so the
+            # groups are still there after the restart.
+            if self._running.is_set():
+                for group, remaining in self.groups.remove_user(name).items():
+                    self._group_update(remaining, "left", group, name, f"{name} left {group}")
             self._broadcast(system_message("leave", name, f"{name} left the chat"))
 
     # ------------------------------------------------------------- features

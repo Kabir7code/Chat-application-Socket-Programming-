@@ -6,6 +6,10 @@ anyone who joins or is added later (FR-010, #18). Every method takes the same
 lock, because many client threads create, join and leave groups at once.
 Methods return copies of member lists, so callers can send messages after
 the lock is released.
+
+FR-013 (#51): if a MessageStore is given, every change (create, join, add,
+leave, admin handover, delete) is saved to the database, and the saved
+groups are loaded again when the server starts.
 """
 
 import re
@@ -35,9 +39,27 @@ class Group:
 
 
 class GroupManager:
-    def __init__(self):
+    def __init__(self, store=None):
         self._lock = threading.Lock()
         self._groups = {}
+        self._store = store
+        if store is not None:
+            for name, (admin, members) in store.load_groups().items():
+                if not members:
+                    continue  # an empty group should never have been saved
+                group = Group(name, admin)
+                group.members = members
+                self._groups[name] = group
+
+    def _save(self, name):
+        """Write one group's current state to the database (lock held)."""
+        if self._store is None:
+            return
+        group = self._groups.get(name)
+        if group is None:
+            self._store.delete_group(name)
+        else:
+            self._store.save_group_state(group.name, group.admin, group.members)
 
     # ----------------------------------------------------------- helpers
     def _get(self, name):
@@ -59,6 +81,7 @@ class GroupManager:
             if name in self._groups:
                 raise GroupError("GROUP_EXISTS", "Group name already exists.")
             self._groups[name] = Group(name, creator)
+            self._save(name)
             return [creator]
 
     def join(self, name, user):
@@ -68,6 +91,7 @@ class GroupManager:
             if user in group.members:
                 raise GroupError("ALREADY_MEMBER", f"You are already a member of '{name}'.")
             group.members.append(user)
+            self._save(name)
             return list(group.members)
 
     def add(self, name, by, user):
@@ -79,6 +103,7 @@ class GroupManager:
             if user in group.members:
                 raise GroupError("ALREADY_MEMBER", f"{user} is already a member of '{name}'.")
             group.members.append(user)
+            self._save(name)
             return list(group.members)
 
     def leave(self, name, user):
@@ -111,6 +136,7 @@ class GroupManager:
             del self._groups[group.name]
         elif group.admin == user:
             group.admin = group.members[0]
+        self._save(group.name)  # saves the new state, or deletes an empty group
         return list(group.members)
 
     # ----------------------------------------------------------- history
