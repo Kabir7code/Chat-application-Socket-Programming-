@@ -50,6 +50,9 @@ Both programs accept the same options. Command-line flags win over environment v
 | Server private key | `--key` | `CHAT_KEY` | `certs/server.key` |
 | Certificate the client trusts | `--cafile` | `CHAT_CAFILE` | `certs/server.crt` |
 | Turn encryption off (debugging only) | `--no-tls` | `CHAT_NO_TLS=1` | encryption on |
+| Database file for saved messages (server) | `--db` | `CHAT_DB` | `chat.db` |
+
+The server saves every delivered message in an SQLite file, `chat.db` in the folder you start it from, so messages are kept when it restarts. Use `--db :memory:` to keep nothing, or delete the file to start fresh.
 
 To chat across machines on the same network, create the certificate for the server's IP, start the server with `--host 0.0.0.0`, and give each client a copy of `server.crt` (never the `.key`):
 
@@ -159,7 +162,8 @@ chat/
   registry.py   thread-safe list of connected and registered users
   groups.py     group chat: members, admin, create/join/add/leave
   client.py     terminal client and command parsing
-  config.py     host, port and TLS settings
+  storage.py    saves delivered messages in SQLite (chat.db)
+  config.py     host, port, TLS and database settings
   tls.py        TLS encryption for client and server sockets
   make_cert.py  creates the self-signed server certificate
 tests/          automated tests (pytest)

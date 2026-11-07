@@ -359,7 +359,9 @@ def setup_logging():
 def main():
     setup_logging()
     args = config.parse_args("Run the chat server.")
-    ChatServer(args.host, args.port, config.server_tls(args)).serve_forever()
+    tls_context = config.server_tls(args)
+    log.info("Saving messages to %s", args.db)
+    ChatServer(args.host, args.port, tls_context, db_path=args.db).serve_forever()
 
 
 if __name__ == "__main__":
