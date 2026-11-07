@@ -6,6 +6,9 @@ private messages go to one user only (FR-005), group messages go only to the
 group's members (FR-004), and other users are told when someone joins or
 leaves (FR-006); /users lists who is online (#7). A client that quits, crashes or sends bad
 data is cleaned up without affecting anyone else (FR-007, FR-008).
+
+Every delivered chat, private and group message is saved in an SQLite
+database (FR-011, #50) so it survives a server restart.
 """
 
 import logging
@@ -18,6 +21,7 @@ import time
 from chat import config, protocol, tls
 from chat.groups import GroupError, GroupManager
 from chat.registry import Session, SessionRegistry
+from chat.storage import MEMORY, MessageStore
 
 # NFR-004 (#14): the server reports what it is doing through the standard
 # logging module instead of print(), so messages get a time and a level and
@@ -56,12 +60,17 @@ def enable_keepalive(conn):
 
 
 class ChatServer:
-    def __init__(self, host=config.DEFAULT_HOST, port=config.DEFAULT_PORT, tls_context=None):
+    def __init__(self, host=config.DEFAULT_HOST, port=config.DEFAULT_PORT, tls_context=None,
+                 db_path=MEMORY):
         self.host = host
         self.port = port
         self.tls_context = tls_context  # None = unencrypted (tests, debugging)
         self.registry = SessionRegistry()
         self.groups = GroupManager()
+        # FR-011 (#50): every delivered message is saved here. The default
+        # ":memory:" database is thrown away on exit (tests); pass a file
+        # path for messages that survive a restart.
+        self.store = MessageStore(db_path)
         # IT_08 (#31): one message is handed to all of its recipients before
         # the next one starts, so everyone sees messages in the same order.
         # Re-entrant because a group update can be sent while already holding it.
@@ -108,6 +117,7 @@ class ChatServer:
             self._listener.close()
         for session in self.registry.connected():
             session.close()
+        self.store.close()
 
     # -------------------------------------------------------------- workers
     def _accept_loop(self):
@@ -226,7 +236,9 @@ class ChatServer:
             return
         message = protocol.make_chat_message(text, session.username)
         message["context"] = "general"
-        self._broadcast(message, exclude=session)
+        with self._delivery_lock:  # saved in the same order everyone sees it (#31)
+            self.store.save_chat(message)
+            self._broadcast(message, exclude=session)
 
     def _deliver_private(self, session, recipient_name, text):
         """FR-005: only the sender and the recipient ever see it."""
@@ -234,16 +246,18 @@ class ChatServer:
             return
         recipient = self.registry.get(str(recipient_name))
         message_id, sent_at = protocol.new_message_id(), protocol.timestamp()
-        if recipient is None or not recipient.send({
+        message = {
             "type": "private",
             "id": message_id,
             "time": sent_at,
             "from": session.username,
             "to": recipient_name,
             "text": text,
-        }):
+        }
+        if recipient is None or not recipient.send(message):
             session.send(error_message("USER_NOT_FOUND", "User not found/offline"))
             return
+        self.store.save_private(message)  # only messages that were delivered (#50)
         session.send({"type": "private_sent", "id": message_id, "time": sent_at,
                       "to": recipient_name, "text": text})
 
@@ -291,6 +305,7 @@ class ChatServer:
         chat.update(context="group", group=group)
         with self._delivery_lock:  # history keeps the same order everyone saw (#31)
             self.groups.record(group, chat)
+            self.store.save_group(chat)
             self._send_to(self.groups.members(group), chat, exclude=session.username)
 
     def _send_history(self, session, group):
