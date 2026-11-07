@@ -4,5 +4,10 @@ __pycache__/
 .venv/
 venv/
 
+# Saved messages (python -m chat.server creates chat.db): local data, never commit
+*.db
+*.db-wal
+*.db-shm
+
 # TLS certificates: generate with python -m chat.make_cert, never commit
 certs/

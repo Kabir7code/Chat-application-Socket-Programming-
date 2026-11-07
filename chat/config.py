@@ -7,6 +7,9 @@ Priority: command-line flag > environment variable > default.
     python -m chat.server --host 0.0.0.0 --port 6000
     CHAT_PORT=6000 python -m chat.client
 
+The server saves messages in an SQLite file (#55): `--db path` or
+CHAT_DB, default chat.db. `--db :memory:` keeps nothing after it stops.
+
 Traffic is encrypted with TLS by default (NFR-005). Run
 `python -m chat.make_cert` once to create certs/server.crt and server.key.
 `--no-tls` turns encryption off, for debugging only.
@@ -19,6 +22,7 @@ DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 5000
 DEFAULT_CERT = os.path.join("certs", "server.crt")
 DEFAULT_KEY = os.path.join("certs", "server.key")
+DEFAULT_DB = "chat.db"
 
 
 def parse_args(description, argv=None):
@@ -58,6 +62,12 @@ def parse_args(description, argv=None):
         "--cafile",
         default=os.environ.get("CHAT_CAFILE", DEFAULT_CERT),
         help=f"certificate the client trusts (env CHAT_CAFILE, default {DEFAULT_CERT})",
+    )
+    parser.add_argument(
+        "--db",
+        default=os.environ.get("CHAT_DB", DEFAULT_DB),
+        help=f"server only: SQLite file for saved messages (env CHAT_DB, default {DEFAULT_DB};"
+             " ':memory:' keeps nothing)",
     )
     return parser.parse_args(argv)
 
