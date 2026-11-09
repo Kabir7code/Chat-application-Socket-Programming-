@@ -9,6 +9,7 @@ Commands:
     /leave <group>         leave a group
     /g <group> <text>      message everyone in a group
     /users                 list who is online
+    /history <user>        your last private messages with a user
     /quit                  leave the chat
     /help                  show commands
 """
@@ -29,6 +30,7 @@ HELP = """Commands:
   /leave <group>         leave a group
   /g <group> <text>      message everyone in a group
   /users                 list who is online
+  /history <user>        your last private messages with a user
   /quit                  leave the chat
   /help                  show this help"""
 
@@ -60,7 +62,8 @@ def format_message(message):
         earlier = " (earlier)" if message.get("history") else ""
         return f"{when}[{message['group']}]{earlier} {message['from']}: {message['text']}"
     if kind == "chat":
-        return f"{when}{message['from']}: {message['text']}"
+        earlier = "(earlier) " if message.get("history") else ""  # FR-011 (#56)
+        return f"{when}{earlier}{message['from']}: {message['text']}"
     if kind == "group_update":
         members = ", ".join(message["members"]) or "none"
         return f"* [{message['group']}] {message['text']} (members: {members})"
@@ -68,6 +71,8 @@ def format_message(message):
         return f"{when}[private] {message['from']}: {message['text']}"
     if kind == "private_sent":
         return f"{when}[private to {message['to']}] {message['text']}"
+    if kind == "private_history":  # FR-012 (#57)
+        return format_private_history(message)
     if kind == "users":
         names = message["users"]
         return f"* Online ({len(names)}): {', '.join(names)}"
@@ -76,6 +81,17 @@ def format_message(message):
     if kind == "error":
         return f"! {message['message']}"
     return str(message)
+
+
+def format_private_history(message):
+    """FR-012 (#57): the reply to /history <user>, one line per message."""
+    other, messages = message["with"], message["messages"]
+    if not messages:
+        return f"* No private messages with {other} yet."
+    lines = [f"* Private messages with {other} (last {len(messages)}):"]
+    for item in messages:
+        lines.append(f"  {time_prefix(item)}{item['from']}: {item['text']}")
+    return "\n".join(lines)
 
 
 def parse_command(line):
@@ -100,6 +116,11 @@ def parse_command(line):
         return {"type": kind, **dict(zip(fields, parts))}, None
     if command == "/users":
         return {"type": "list_users"}, None
+    if command == "/history":  # FR-012 (#57)
+        user = rest.strip()
+        if not user or " " in user:
+            return None, "Usage: /history <user>"
+        return {"type": "private_history", "with": user}, None
     if command == "/quit":
         return {"type": "quit"}, None
     if command == "/help":

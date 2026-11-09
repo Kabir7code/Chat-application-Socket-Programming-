@@ -79,6 +79,7 @@ The client checks the server's certificate, so it will refuse to connect to a se
 | `/g <group> <text>` | Sends a message to everyone in the group |
 | `/leave <group>` | Leaves the group |
 | `/users` | Lists everyone who is online |
+| `/history <user>` | Shows your last 20 private messages with `<user>`, oldest first (only your own conversations) |
 | `/quit` | Leaves the chat (others are told you left) |
 | `/help` | Shows the list of commands |
 
