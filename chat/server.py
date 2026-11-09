@@ -31,6 +31,8 @@ LOG_FORMAT = "%(asctime)s %(levelname)-7s %(message)s"
 
 USERNAME_PATTERN = re.compile(r"^[A-Za-z0-9_]{1,20}$")
 MAX_TEXT_LENGTH = 4000
+CHAT_HISTORY_SIZE = 20  # FR-011 (#56): Everyone messages a new user is shown
+PRIVATE_HISTORY_SIZE = 20  # FR-012 (#57): messages shown by /history <user>
 
 # Detect peers that vanish without closing the connection (cable pulled,
 # laptop asleep): the OS probes an idle connection and gives up after
@@ -195,6 +197,8 @@ class ChatServer:
             self._deliver_private(session, message.get("to"), message.get("text"))
         elif kind == "list_users":  # FR-006 (#7)
             session.send({"type": "users", "users": self.registry.usernames()})
+        elif kind == "private_history":  # FR-012 (#57)
+            self._send_private_history(session, message.get("with"))
         elif kind in GROUP_HANDLERS:
             try:
                 GROUP_HANDLERS[kind](self, session, message)
@@ -211,15 +215,20 @@ class ChatServer:
                 "Username must be 1-20 letters, digits or underscores.",
             ))
             return
-        if not self.registry.register(session, username):
-            session.send(error_message("USERNAME_TAKEN", "Username already taken."))
-            return
-        log.info("%s registered", username)
-        session.send({
-            "type": "registered",
-            "username": username,
-            "users": self.registry.usernames(),
-        })
+        # FR-011 (#56): registering and sending the history happen under the
+        # delivery lock, so every Everyone message reaches the new user exactly
+        # once: either saved before they joined (history) or sent live after.
+        with self._delivery_lock:
+            if not self.registry.register(session, username):
+                session.send(error_message("USERNAME_TAKEN", "Username already taken."))
+                return
+            log.info("%s registered", username)
+            session.send({
+                "type": "registered",
+                "username": username,
+                "users": self.registry.usernames(),
+            })
+            self._send_chat_history(session)
         self._broadcast(
             system_message("join", username, f"{username} joined the chat"),
             exclude=session,
@@ -312,6 +321,26 @@ class ChatServer:
             self.groups.record(group, chat)
             self.store.save_group(chat)
             self._send_to(self.groups.members(group), chat, exclude=session.username)
+
+    def _send_chat_history(self, session):
+        """FR-011 (#56): show a new user the last Everyone messages, oldest
+        first, including ones saved before a server restart."""
+        for message in self.store.recent_chat(CHAT_HISTORY_SIZE):
+            message["history"] = True
+            session.send(message)
+
+    def _send_private_history(self, session, other):
+        """FR-012 (#57): the last private messages between this user and
+        `other`, oldest first. One side is always the user asking, so
+        nobody can read a conversation they are not part of."""
+        other = str(other or "").strip()
+        if not USERNAME_PATTERN.match(other):
+            session.send(error_message("INVALID_USERNAME", "Usage: /history <user>"))
+            return
+        messages = self.store.private_between(session.username, other, PRIVATE_HISTORY_SIZE)
+        for item in messages:
+            item["history"] = True
+        session.send({"type": "private_history", "with": other, "messages": messages})
 
     def _send_history(self, session, group):
         """FR-010 (#18): show a new member the group's recent messages."""
