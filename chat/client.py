@@ -60,7 +60,8 @@ def format_message(message):
         earlier = " (earlier)" if message.get("history") else ""
         return f"{when}[{message['group']}]{earlier} {message['from']}: {message['text']}"
     if kind == "chat":
-        return f"{when}{message['from']}: {message['text']}"
+        earlier = "(earlier) " if message.get("history") else ""  # FR-011 (#56)
+        return f"{when}{earlier}{message['from']}: {message['text']}"
     if kind == "group_update":
         members = ", ".join(message["members"]) or "none"
         return f"* [{message['group']}] {message['text']} (members: {members})"

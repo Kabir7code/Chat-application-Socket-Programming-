@@ -31,6 +31,7 @@ LOG_FORMAT = "%(asctime)s %(levelname)-7s %(message)s"
 
 USERNAME_PATTERN = re.compile(r"^[A-Za-z0-9_]{1,20}$")
 MAX_TEXT_LENGTH = 4000
+CHAT_HISTORY_SIZE = 20  # FR-011 (#56): Everyone messages a new user is shown
 
 # Detect peers that vanish without closing the connection (cable pulled,
 # laptop asleep): the OS probes an idle connection and gives up after
@@ -211,15 +212,20 @@ class ChatServer:
                 "Username must be 1-20 letters, digits or underscores.",
             ))
             return
-        if not self.registry.register(session, username):
-            session.send(error_message("USERNAME_TAKEN", "Username already taken."))
-            return
-        log.info("%s registered", username)
-        session.send({
-            "type": "registered",
-            "username": username,
-            "users": self.registry.usernames(),
-        })
+        # FR-011 (#56): registering and sending the history happen under the
+        # delivery lock, so every Everyone message reaches the new user exactly
+        # once: either saved before they joined (history) or sent live after.
+        with self._delivery_lock:
+            if not self.registry.register(session, username):
+                session.send(error_message("USERNAME_TAKEN", "Username already taken."))
+                return
+            log.info("%s registered", username)
+            session.send({
+                "type": "registered",
+                "username": username,
+                "users": self.registry.usernames(),
+            })
+            self._send_chat_history(session)
         self._broadcast(
             system_message("join", username, f"{username} joined the chat"),
             exclude=session,
@@ -312,6 +318,13 @@ class ChatServer:
             self.groups.record(group, chat)
             self.store.save_group(chat)
             self._send_to(self.groups.members(group), chat, exclude=session.username)
+
+    def _send_chat_history(self, session):
+        """FR-011 (#56): show a new user the last Everyone messages, oldest
+        first, including ones saved before a server restart."""
+        for message in self.store.recent_chat(CHAT_HISTORY_SIZE):
+            message["history"] = True
+            session.send(message)
 
     def _send_history(self, session, group):
         """FR-010 (#18): show a new member the group's recent messages."""
