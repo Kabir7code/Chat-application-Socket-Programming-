@@ -51,8 +51,9 @@ Both programs accept the same options. Command-line flags win over environment v
 | Certificate the client trusts | `--cafile` | `CHAT_CAFILE` | `certs/server.crt` |
 | Turn encryption off (debugging only) | `--no-tls` | `CHAT_NO_TLS=1` | encryption on |
 | Database file for saved messages (server) | `--db` | `CHAT_DB` | `chat.db` |
+| Newest messages kept per chat, 0 = all (server) | `--keep` | `CHAT_KEEP` | `500` |
 
-The server saves every delivered message in an SQLite file, `chat.db` in the folder you start it from, so messages are kept when it restarts. Use `--db :memory:` to keep nothing, or delete the file to start fresh.
+The server keeps messages and groups in an SQLite file (`--db`, default `chat.db`); see [Persistence](#persistence).
 
 To chat across machines on the same network, create the certificate for the server's IP, start the server with `--host 0.0.0.0`, and give each client a copy of `server.crt` (never the `.key`):
 
@@ -175,6 +176,30 @@ Alice creates a group and adds Carol, Bob joins and later leaves. Every change s
 
 Group names are 1-30 letters, digits, underscores or hyphens. Only members can send to a group. If the admin leaves, the next member becomes admin, and an empty group is deleted.
 
+## Persistence
+
+The server saves its data in one SQLite file, so a restart loses nothing. It uses Python's built-in `sqlite3`, so there is nothing extra to install.
+
+**Where.** `chat.db` in the folder you start the server from. Change it with `--db path/to/file.db` or `CHAT_DB`. `--db :memory:` keeps everything in memory and forgets it when the server stops (the tests use this).
+
+**What is saved.**
+
+| Data | What you see after a restart |
+|---|---|
+| Everyone messages | New users get the last 20, marked "(earlier)" |
+| Private messages | `/history <user>` shows your last 20 with that user |
+| Messages to someone offline | Delivered the next time they log in, marked "(while you were away)" |
+| Groups, members and admin | Still there; members are back in their groups when they log in |
+| Group messages | Anyone joining a group sees the last 10, marked "(earlier)" |
+
+The web page loads the same history when you join or open a chat.
+
+**How big it gets.** Only the newest 500 messages of each chat (Everyone, each private conversation, each group) are kept; older ones are deleted as new ones arrive. Change this with `--keep 1000` or `CHAT_KEEP`, or `--keep 0` to keep everything.
+
+**Starting fresh.** Stop the server and delete `chat.db` (and `chat.db-wal` / `chat.db-shm` if they are there). The tables are created again on the next start. The `.db` files are in `.gitignore`, so they are never committed.
+
+**Tables.** `messages`, `groups`, `group_members`, `users` and `offline_messages`; see [Documents/Database_Tables.png](Documents/Database_Tables.png).
+
 ## Project layout
 
 ```
@@ -184,22 +209,23 @@ chat/
   registry.py   thread-safe list of connected and registered users
   groups.py     group chat: members, admin, create/join/add/leave
   client.py     terminal client and command parsing
-  storage.py    saves delivered messages in SQLite (chat.db)
+  storage.py    saves messages, groups and offline messages in SQLite (chat.db)
   config.py     host, port, TLS and database settings
   tls.py        TLS encryption for client and server sockets
   make_cert.py  creates the self-signed server certificate
   web.py        web gateway: lets a browser use the chat (python -m chat.web)
   static/       the web page: index.html, app.js, style.css
 tests/          automated tests (pytest)
-Documents/      SRS, use-case diagram and flows, test cases
+Documents/      SRS, SAD, use-case diagram and flows, test cases, diagrams
 ```
 
 ## How it works
 
 - **Framing.** TCP is a byte stream, so every message is sent as a 4-byte length followed by a JSON body. Long or rapid messages always arrive whole and separate.
 - **Concurrency.** The server starts one thread per client. Shared state lives in a lock-protected registry, and each socket has its own send lock so two threads never write to it at once.
-- **Groups.** Group membership is kept on the server, so a group message is only ever sent to current members. Leaving or disconnecting removes you from every group.
+- **Groups.** Group membership is kept on the server, so a group message is only ever sent to current members. Leaving or disconnecting removes you from every group; a server restart does not.
 - **Encryption.** Every connection is wrapped in TLS (1.2 or newer). A test captures the raw network bytes during a chat and checks that no message text, usernames or JSON can be read from them.
+- **Persistence.** One `MessageStore` object owns the SQLite connection. Every write happens while the server holds its delivery lock, so the saved order is the order everyone saw, and a user who logs in while a message is being sent gets it exactly once.
 - **Registration first.** A socket must register a unique username before it can send anything.
 - **Failure isolation.** Bad input, crashes or a failed send on one client never affect anyone else. TCP keepalive detects clients that vanish without closing the connection.
 
