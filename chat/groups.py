@@ -1,8 +1,9 @@
 """Group chat state (FR-004): which groups exist and who is in them.
 
 Kept separate from the server so the rules can be tested on their own.
-Each group also keeps its last HISTORY_SIZE messages, which are shown to
-anyone who joins or is added later (FR-010, #18). Every method takes the same
+Anyone who joins or is added later is shown the group's last HISTORY_SIZE
+messages (FR-010, #18). With a database these come from the saved messages,
+so they survive a restart (#61); without one they are kept in memory. Every method takes the same
 lock, because many client threads create, join and leave groups at once.
 Methods return copies of member lists, so callers can send messages after
 the lock is released.
@@ -58,6 +59,9 @@ class GroupManager:
         group = self._groups.get(name)
         if group is None:
             self._store.delete_group(name)
+            # #61: a deleted group's messages go too, so a new group with
+            # the same name does not show the old group's history
+            self._store.delete_group_messages(name)
         else:
             self._store.save_group_state(group.name, group.admin, group.members)
 
@@ -141,17 +145,27 @@ class GroupManager:
 
     # ----------------------------------------------------------- history
     def record(self, name, message):
-        """FR-010: remember a group message for people who join later."""
+        """FR-010: remember a group message for people who join later.
+        With a database the server has already saved it there (#61), so
+        only a GroupManager without one keeps it in memory."""
+        if self._store is not None:
+            return
         with self._lock:
             group = self._groups.get(name)
             if group is not None:
                 group.history.append(dict(message))
 
     def history(self, name):
-        """The group's recent messages, oldest first (copies)."""
+        """The group's recent messages, oldest first (copies).
+        FR-010 (#61): read from the database when there is one, so the
+        history survives a server restart."""
         with self._lock:
             group = self._groups.get(name)
-            return [dict(m) for m in group.history] if group else []
+            if group is None:
+                return []
+            if self._store is None:
+                return [dict(m) for m in group.history]
+        return self._store.group_messages(name, HISTORY_SIZE)
 
     # ------------------------------------------------------------ queries
     def members(self, name):
