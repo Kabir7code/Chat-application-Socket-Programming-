@@ -1,0 +1,57 @@
+// Database tables of the chat server (#58). Render:
+//   dot -Tpng -Gdpi=150 database.dot -o ../Database_Tables.png
+digraph Tables {
+  graph [rankdir=LR, fontname="Helvetica", fontsize=20, labelloc=t, pad=0.4, nodesep=0.5, ranksep=1.2, bgcolor=white,
+         label="Database tables (chat.db, SQLite)\n "];
+  node  [shape=plain, fontname="Helvetica", fontsize=11];
+  edge  [fontname="Helvetica", fontsize=10, color="#222222"];
+
+  messages [label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="5">
+      <tr><td bgcolor="#CFE8FF" colspan="2"><b>messages</b> (#50, #54)</td></tr>
+      <tr><td align="left"><u>id</u></td><td align="left">INTEGER, order saved</td></tr>
+      <tr><td align="left">msg_id</td><td align="left">INTEGER, protocol message ID</td></tr>
+      <tr><td align="left">time</td><td align="left">TEXT, ISO 8601 UTC</td></tr>
+      <tr><td align="left">kind</td><td align="left">'chat' | 'private' | 'group'</td></tr>
+      <tr><td align="left">sender</td><td align="left">TEXT</td></tr>
+      <tr><td align="left">recipient</td><td align="left">TEXT, private only</td></tr>
+      <tr><td align="left">grp</td><td align="left">TEXT, group only</td></tr>
+      <tr><td align="left">text</td><td align="left">TEXT</td></tr>
+    </table>>];
+
+  groups [label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="5">
+      <tr><td bgcolor="#FFF2B3" colspan="2"><b>groups</b> (#51)</td></tr>
+      <tr><td align="left" port="name"><u>name</u></td><td align="left">TEXT</td></tr>
+      <tr><td align="left">admin</td><td align="left">TEXT</td></tr>
+    </table>>];
+
+  group_members [label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="5">
+      <tr><td bgcolor="#FFF2B3" colspan="2"><b>group_members</b> (#51)</td></tr>
+      <tr><td align="left"><u>grp</u> (FK)</td><td align="left" port="grp">TEXT</td></tr>
+      <tr><td align="left"><u>username</u></td><td align="left">TEXT</td></tr>
+      <tr><td align="left">position</td><td align="left">INTEGER, joining order</td></tr>
+    </table>>];
+
+  users [label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="5">
+      <tr><td bgcolor="#D9F2D9" colspan="2"><b>users</b> (#59)</td></tr>
+      <tr><td align="left" port="name"><u>name</u></td><td align="left">TEXT</td></tr>
+      <tr><td align="left">first_seen</td><td align="left">TEXT</td></tr>
+    </table>>];
+
+  offline_messages [label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="5">
+      <tr><td bgcolor="#D9F2D9" colspan="2"><b>offline_messages</b> (#59)</td></tr>
+      <tr><td align="left"><u>id</u></td><td align="left">INTEGER, delivery order</td></tr>
+      <tr><td align="left">msg_id</td><td align="left">INTEGER</td></tr>
+      <tr><td align="left">time</td><td align="left">TEXT</td></tr>
+      <tr><td align="left">sender</td><td align="left">TEXT</td></tr>
+      <tr><td align="left">recipient</td><td align="left" port="recipient">TEXT</td></tr>
+      <tr><td align="left">text</td><td align="left">TEXT</td></tr>
+    </table>>];
+
+  group_members:grp:e -> groups:name:w [arrowhead=tee, arrowtail=crow, dir=both, label="many to one\nON DELETE CASCADE"];
+  offline_messages:recipient:e -> users:name:w [style=dashed, arrowhead=open, label="waits for"];
+}
