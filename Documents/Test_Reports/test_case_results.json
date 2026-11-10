@@ -1,0 +1,354 @@
+{
+ "UT_01": [
+  "Terminal client sent the name and the server accepted it; client printed: 'Welcome, alice_23! Online: nobody yet'",
+  "Pass"
+ ],
+ "UT_02": [
+  "Web UI: blocked on the page with 'Use 1-20 letters, digits or underscores.', no request sent. Terminal client: not blocked, the empty name is sent and the server replies '' (#29 is closed, but the terminal client was not changed).",
+  "Partial"
+ ],
+ "UT_03": [
+  "Web UI: the name box stops at 20 characters, so the page joined as a 20-character name without any message. Terminal client: not blocked locally; the name is sent and the server rejects it with 'Username must be 1-20 letters, digits or underscores.'. The limit is enforced, but no client shows 'Username exceeds maximum length' before sending (#29 is closed, but the terminal client was not changed).",
+  "Partial"
+ ],
+ "IT_01": [
+  "Server replied 'registered' and 'rahul' is in the active-user list ['rahul'].",
+  "Pass"
+ ],
+ "IT_02": [
+  "Second 'rahul' got error 'Username already taken.' (USERNAME_TAKEN); active-user list is still ['rahul'].",
+  "Pass"
+ ],
+ "IT_03": [
+  "Usernames are case-sensitive (documented in the SAD): 'rahul' was accepted while 'Rahul' was online (registered); the same attempt repeated gave the same decision (registered).",
+  "Pass"
+ ],
+ "ST_01": [
+  "Registered in 0 ms; 'priya_k' is in the server's active-user list. The terminal client reaches the chat prompt ('Welcome, priya_k2! Online: priya_k').",
+  "Pass"
+ ],
+ "ST_02": [
+  "Client exited after 0.5 s with 'Could not connect to 127.0.0.1:<port> ([Errno 111] Connection refused)' instead of hanging.",
+  "Pass"
+ ],
+ "UT_04": [
+  "Session holds username 'testuser1', the socket passed in, and alive=True.",
+  "Pass"
+ ],
+ "UT_05": [
+  "Lookup returned userA's session only (the registry looks sessions up by username).",
+  "Pass"
+ ],
+ "UT_06": [
+  "After removing userB the store holds ['userA', 'userC']; userA and userC unchanged.",
+  "Pass"
+ ],
+ "IT_04": [
+  "Both appear in the active list ['userA', 'userB'], each on its own socket and session.",
+  "Pass"
+ ],
+ "IT_05": [
+  "While A sent 5 messages, B stayed connected and its own request was answered in 0 ms; B also received A's messages.",
+  "Pass"
+ ],
+ "IT_06": [
+  "Only userB was removed; list is ['userA', 'userC'] and A -> C messaging still works.",
+  "Pass"
+ ],
+ "ST_03": [
+  "All 10 clients registered in 0.01 s; the server tracks 10 sessions and a message from one reached the other 9.",
+  "Pass"
+ ],
+ "ST_04": [
+  "New client joined during live chat; the 5 existing users stayed connected and kept receiving messages.",
+  "Pass"
+ ],
+ "UT_07": [
+  "Function returns {'type': 'chat', 'id': 28, 'time': '...', 'from': 'userA', 'text': 'Hello there'} - sender, text and a generated message ID.",
+  "Pass"
+ ],
+ "UT_08": [
+  "Pressing Enter on an empty or blank line sends nothing (other users received 0 messages); a blank message sent directly is rejected by the server (EMPTY_MESSAGE).",
+  "Pass"
+ ],
+ "UT_09": [
+  "Limit is 4000 characters (D4). A 4001-character message is rejected with 'Messages are limited to 4000 characters.' and nothing is delivered; 1500 characters are delivered whole.",
+  "Pass"
+ ],
+ "IT_07": [
+  "Client B received {from: clientA, text: 'Hi Client B'} immediately, with an ID and timestamp.",
+  "Pass"
+ ],
+ "IT_08": [
+  "Three senders fired at the same instant, 200 runs: the two observers saw the same order every time, with correct senders (0 mismatches; was 4 in 300 in Sprint 1, fixed by #31).",
+  "Pass"
+ ],
+ "IT_09": [
+  "The server never reports a false success: the first message was confirmed as delivered before B closed, and one sent after B left was reported as 'queued for later delivery' (FR-012), not dropped.",
+  "Pass"
+ ],
+ "ST_05": [
+  "All 10 alternating messages arrived at the right person, in order; slowest delivery 47.4 ms.",
+  "Pass"
+ ],
+ "ST_06": [
+  "Both clients were left idle and connected for 600 seconds; 'back online' was then delivered normally.",
+  "Pass"
+ ],
+ "UT_10": [
+  "Group 'ProjectTeam' created with members ['userA'] and admin 'userA'.",
+  "Pass"
+ ],
+ "UT_11": [
+  "Second create rejected with GROUP_EXISTS: 'Group name already exists.'. Only one 'ProjectTeam' exists.",
+  "Pass"
+ ],
+ "UT_12": [
+  "is_member returns True for userB and False for userC.",
+  "Pass"
+ ],
+ "IT_10": [
+  "'StudyGroup' is in the server's group list with members ['clientA']; A got a 'created' update and is the admin.",
+  "Pass"
+ ],
+ "IT_11": [
+  "B joined; members are ['clientA', 'clientB'] and B's group message reached A.",
+  "Pass"
+ ],
+ "IT_12": [
+  "B received 'Meeting at 5pm' in StudyGroup; C received nothing (0 messages).",
+  "Pass"
+ ],
+ "IT_13": [
+  "After B left, 'anyone still here?' did not reach B; members are now ['A'].",
+  "Pass"
+ ],
+ "IT_14": [
+  "Server answered 'You are already a member of 'StudyGroup'.' (ALREADY_MEMBER); membership not duplicated (['A']) and A stays connected.",
+  "Pass"
+ ],
+ "ST_07": [
+  "Step 3 reached A and C; after C left, step 5 reached only B (and A sent it).",
+  "Pass"
+ ],
+ "ST_08": [
+  "A received each message under its own group: {'for study': 'StudyGroup', 'for squad': 'Squad'}.",
+  "Pass"
+ ],
+ "UT_13": [
+  "Message built as {'type': 'private', 'from': 'userA', 'to': 'userB', 'text': 'hey', 'id', 'time'}} - one recipient, flagged private.",
+  "Pass"
+ ],
+ "UT_14": [
+  "Server answered 'User not found/offline' (code USER_NOT_FOUND); nothing was delivered or saved.",
+  "Pass"
+ ],
+ "UT_15": [
+  "Both rejected by the same check used for group and normal messages: 'Message text is empty.' and 'Messages are limited to 4000 characters.'.",
+  "Pass"
+ ],
+ "IT_15": [
+  "B received it; C received nothing (0 messages).",
+  "Pass"
+ ],
+ "IT_16": [
+  "The message did not disappear silently: A was told '[19:57] [private to userB] hi (offline - delivered when they log in)'. Since FR-012 (#59) a user who has used the chat gets it on their next login instead of an error; a name that never logged in still gets 'User not found/offline' (UT_14).",
+  "Pass"
+ ],
+ "IT_17": [
+  "B got the private message and the group message on separate channels; C saw only 'hey team'.",
+  "Pass"
+ ],
+ "ST_09": [
+  "B only got its 3 messages, C only got its 3, and A got 6 replies with the right senders.",
+  "Pass"
+ ],
+ "ST_10": [
+  "B got the private message while 20 group messages were arriving at A; A's screen shows it as '[19:57] [private to B] private during traffic', separate from '[Squad]' lines.",
+  "Pass"
+ ],
+ "UT_16": [
+  "'newuser' is now in the active list ['newuser'] and its session is alive.",
+  "Pass"
+ ],
+ "UT_17": [
+  "Only userA removed; list is ['userB'].",
+  "Pass"
+ ],
+ "UT_18": [
+  "Member list is exactly ['userB'] (and userB became admin).",
+  "Pass"
+ ],
+ "IT_18": [
+  "A and B both got 'userC joined the chat', and the online list (/users and the web page's list) now shows ['userA', 'userB', 'userC'].",
+  "Pass"
+ ],
+ "IT_19": [
+  "A and B both got 'userC left the chat'; the online list is now ['userA', 'userB'].",
+  "Pass"
+ ],
+ "IT_20": [
+  "Both A and B received a group update listing ['A', 'B'], with no refresh needed.",
+  "Pass"
+ ],
+ "ST_11": [
+  "Final active-user list on the server: ['A', 'C', 'D'].",
+  "Pass"
+ ],
+ "ST_12": [
+  "All 4 remaining clients received both join notices and the leave notice; slowest within 3 ms. Final list ['new1', 'new2', 'u0', 'u1', 'u2', 'u3'].",
+  "Pass"
+ ],
+ "UT_19": [
+  "Session marked not alive and removed from the active list; no exception raised.",
+  "Pass"
+ ],
+ "UT_20": [
+  "Handler saw the closed socket, ended its loop and cleaned up the session (no loop, no crash).",
+  "Pass"
+ ],
+ "UT_21": [
+  "Socket handle released (closed) and session removed; userA was taken out of both groups (Squad deleted as empty, Study now ['x']).",
+  "Pass"
+ ],
+ "IT_21": [
+  "A was removed from the active-user list in 20 ms, and B got 'A left the chat'.",
+  "Pass"
+ ],
+ "IT_22": [
+  "Client process was force-killed (SIGKILL); the server removed A after 0.02 s (the OS closed the socket; TCP keepalive covers a lost network).",
+  "Pass"
+ ],
+ "IT_23": [
+  "A stays connected and is still in StudyGroup; only Squad membership was removed (Squad was deleted because it became empty).",
+  "Pass"
+ ],
+ "ST_13": [
+  "After 2 /quit and 2 forced resets the server was still accepting connections; final list before the check was ['u4'].",
+  "Pass"
+ ],
+ "ST_14": [
+  "Reconnect with the same name succeeded ('registered') as a fresh session.",
+  "Pass"
+ ],
+ "UT_22": [
+  "Invalid bytes, broken JSON and a non-object all raised a handled ProtocolError; no crash.",
+  "Pass"
+ ],
+ "UT_23": [
+  "send() returned False instead of raising, and the session was marked for cleanup.",
+  "Pass"
+ ],
+ "UT_24": [
+  "A WARNING log entry was written with the time, the user and the error: '2026-11-10 19:57:19,719 WARNING chat.server: Broken frame from alice; disconnecting'. Unexpected errors are logged with a traceback.",
+  "Pass"
+ ],
+ "IT_24": [
+  "A got 'Message was not valid JSON.'; B stayed connected and kept receiving messages.",
+  "Pass"
+ ],
+ "IT_25": [
+  "Forced a TCP reset on A; the server cleaned A up and B -> C messaging was not interrupted.",
+  "Pass"
+ ],
+ "IT_26": [
+  "After the server was stopped the client printed '[disconnected from server]' straight away.",
+  "Pass"
+ ],
+ "ST_15": [
+  "One abrupt reset and one corrupt frame at the same moment: both sessions were cleaned up, the server kept running and the other 3 kept chatting (['u2', 'u3', 'u4']).",
+  "Pass"
+ ],
+ "ST_16": [
+  "userA was dropped for a bad frame, reconnected under the same name, rejoined Squad, and private, normal and group messages all worked.",
+  "Pass"
+ ],
+ "UT_25": [
+  "The saved message came back identical: same type, ID, time, sender, text and context.",
+  "Pass"
+ ],
+ "UT_26": [
+  "alice-bob history is ['hi bob', 'hi alice']: both directions, oldest first, nobody else's messages.",
+  "Pass"
+ ],
+ "IT_27": [
+  "Two users sent 30 messages each at once; the 60 saved messages are in exactly the order C saw them.",
+  "Pass"
+ ],
+ "IT_28": [
+  "bob got the last 20 (m5 to m24), oldest first, right after 'registered'; the terminal shows them as '[19:57] (earlier) alice: m5'.",
+  "Pass"
+ ],
+ "ST_17": [
+  "Server stopped and started again on the same chat.db; bob's terminal showed '[19:57] (earlier) alice: before the restart' after logging in.",
+  "Pass"
+ ],
+ "UT_27": [
+  "'/history bob' becomes {'type': 'private_history', 'with': 'bob'}; '/history' and '/history bob carol' show 'Usage: /history <user>' locally and send nothing. /help lists the command.",
+  "Pass"
+ ],
+ "IT_29": [
+  "/history bob returned the last 20 of 25 messages (p5 to p24), oldest first, both directions, each marked as history.",
+  "Pass"
+ ],
+ "IT_30": [
+  "carol asked for her history with alice and with bob: both empty. One side of the query is always the user asking, so alice-bob messages cannot be read.",
+  "Pass"
+ ],
+ "IT_31": [
+  "alice was told '[19:57] [private to bob] call me (offline - delivered when they log in)'; 1 message is waiting for bob.",
+  "Pass"
+ ],
+ "IT_32": [
+  "On login bob got 'one', 'two', 'three' in order, shown as '[19:57] [private] alice (while you were away): one'; logging in again delivered nothing a second time.",
+  "Pass"
+ ],
+ "ST_18": [
+  "alice saw '[19:57] [private to bob] see you after the restart (offline - delivered when they log in)'. After the server restarted, bob logged in and saw '[19:57] [private] alice (while you were away): see you after the restart'.",
+  "Pass"
+ ],
+ "UT_28": [
+  "load_groups() returned {'Squad': ('adam', ['adam', 'mia'])}: the latest admin and members in joining order; the deleted group is gone.",
+  "Pass"
+ ],
+ "IT_33": [
+  "After a restart Squad had members ['alice', 'bob'] and admin 'alice'; alice's group message reached bob without anyone rejoining.",
+  "Pass"
+ ],
+ "IT_34": [
+  "After a restart carol joined Squad and was shown its last 10 messages (g2 to g11), marked earlier.",
+  "Pass"
+ ],
+ "IT_35": [
+  "bob quit normally and was removed from Squad; the database holds {'Squad': ('alice', ['alice'])} (only a server restart keeps memberships).",
+  "Pass"
+ ],
+ "UT_29": [
+  "Default 'chat.db'; with CHAT_DB set 'env.db'; with --db as well 'flag.db' (the flag wins).",
+  "Pass"
+ ],
+ "UT_30": [
+  "--keep -1 and --keep lots are both rejected with a usage error; the default is 500.",
+  "Pass"
+ ],
+ "IT_36": [
+  "With --keep 5 the Everyone chat kept ['e3', 'e4', 'e5', 'e6', 'e7'] and the alice-bob chat kept the newest 5; each chat is trimmed on its own.",
+  "Pass"
+ ],
+ "ST_19": [
+  "The server logged 'Saving messages to <tmp>/data/mychat.db' and created the file with tables ['group_members', 'groups', 'messages', 'offline_messages', 'users']. With --db :memory: a restart started empty (0 messages).",
+  "Pass"
+ ],
+ "ST_20": [
+  "After two restarts a new user saw '(earlier) alice: hello all', joining Squad showed 'hello squad', alice's /history bob returned ['hello bob'], and Squad still had alice and bob.",
+  "Pass"
+ ],
+ "ST_21": [
+  "After a server restart bob joined from the web page. Everyone: shown, Squad: shown, private chat with alice: shown.",
+  "Pass"
+ ],
+ "ST_22": [
+  "With the database broken, messages were still delivered, nobody was disconnected, and the error was logged ('Could not save chat message from alice').",
+  "Pass"
+ ]
+}

@@ -2,9 +2,9 @@
 
 Real-Time Chat Application Using Socket Programming. Software Engineering (UE23CS341A), PES University.
 
-This file lists every place where the Sprint 1 build differs from the SRS, the SAD, the Test Cases or the sprint process in the deliverables sheet, and why. It is updated at the end of each sprint and is what we will walk through in the final demo.
+This file lists every place where the build differs from the SRS, the SAD, the Test Cases or the sprint process in the deliverables sheet, and why. It is updated at the end of each sprint and is what we will walk through in the final demo.
 
-Last updated: 24 Oct 2026, after Sprint 1.
+Last updated: 11 Nov 2026, after Sprint 3 and the Part-3 testing (sections 5 to 8). Sections 1 to 4 are the Sprint 1 entries; their current status is in section 5.
 
 ## 1. Process
 
@@ -42,3 +42,43 @@ Last updated: 24 Oct 2026, after Sprint 1.
 | B3 | UT_07 | See D3. | Sprint 2. Bug #30. |
 
 Full results are in the Test Cases document: 42 Pass, 4 Partial, 5 Fail, 15 Not executed (they need group chat, a Sprint 2 feature).
+
+## 5. Status of the Sprint 1 entries
+
+| # | Status after Sprint 3 |
+|---|---|
+| D2, B2 | **Still open.** Bug #29 was closed, but the change it asks for was never made to the terminal client: only a mock-up file (`Client-should-validate-username-before-sending.jsx`) was added at the repository root. The web UI does check names before sending (empty name blocked; the box stops at 20 characters). UT_02 and UT_03 are therefore Partial. See B4. |
+| D3, B3 | Fixed in Sprint 2: every message has an ID and a timestamp (#30, #13). UT_07 passes. |
+| B1 | Fixed in Sprint 2 (#31): broadcasts are sent under one lock. IT_08 passed 200 out of 200 simultaneous-send rounds in each of 4 runs. |
+| F1 | Done in Sprint 2 (#7): `/users` and the web UI's online list. IT_18 and IT_19 now pass. |
+| F2 | Done in Sprint 2 (#14): logging with time, level, user and traceback. UT_24 passes. |
+| F3 | Done in Sprint 2 (#22): TLS encryption. |
+| F4 | Done in Sprint 2 (#16) as a web page served on localhost by `python -m chat.web`, rather than a desktop window. It needs no extra libraries and works the same on every laptop. |
+
+## 6. Sprint 3 (optional sprint for spill-over: saving the chat)
+
+| # | Deviation | Reason | Action |
+|---|---|---|---|
+| S1 | Requirements FR-011 (saved messages and history on login), FR-012 (private history, offline messages), FR-013 (groups survive a restart), NFR-006 (data survives a restart) and NFR-007 (database size kept in check) were added to the backlog (#50 to #61). They are not in the SRS document. | Part-3 allows an extra sprint; the team used it to make the chat persistent, which the SRS had left out. | Traced and validated in the System Validation Report and the Test Cases document. |
+| S2 | IT_16 changed: a private message to someone who has used the chat but is offline is now kept and delivered at their next login, instead of returning "User not found/offline". | Intended behaviour of FR-012 (#59). | Test case updated. A name that never logged in still gets the error (UT_14). |
+| S3 | The "Testing" week in the Part-3 sheet (2 to 6 Nov) overlapped Sprint 3 (5 to 11 Nov). | Sprint 3 changed the same features, so testing them before it finished would have had to be redone. | All 88 test cases were run on the complete Sprint 3 code on 11 Nov; the Test Plan schedule records this. |
+| S4 | Several Sprint 3 uploads put their files at the top of the repository instead of in `chat/`, `tests/` or `Documents/` (PRs #66, #67, #68, #69, #70). The app did not use those files. | Files were dragged into GitHub's upload page one by one instead of as folders. | #66 and #67 were fixed before merging; #69 and #70 are fixed by PR #71. #53 (PR #68) must be uploaded again. The upload instructions now say to drag the folders and check the paths before committing. |
+| S5 | Sprint 3 pull requests were merged in a different order from the plan. | Team members uploaded when they were ready. | Conflicts were resolved and each later upload was rebuilt on top of what was already merged. |
+
+## 7. Defects found in Part-3 testing
+
+| # | Test case | Problem | Plan |
+|---|---|---|---|
+| B4 | UT_02, UT_03 | The terminal client sends an empty or too-long username to the server instead of rejecting it first. The server rejects it with a clear message, so nothing breaks. | Reopen #29 and add the check to `register()` in `chat/client.py`. |
+| B5 | Found while testing (not a test case) | `ChatServer.stop()` closes the database while a client thread may still be handling a message. Seen once: a user logging in during shutdown got a server error, which was logged. | Low priority. Close sessions and wait for their threads before closing the store. |
+| B6 | ST_21 | After a server restart, a private chat appears in the web UI's chat list only when the other person is online or sends a new message; its saved history then loads. There is no list of past private conversations. | Low priority. History is not lost (`/history <user>` also works). Possible future item. |
+
+## 8. Part-3 test results
+
+Full results are in the Test Cases document and `Documents/Test_Reports/`:
+
+- 88 test cases (66 from Sprints 1 and 2, 9 of them updated, plus 22 new for Sprint 3): 86 Pass, 2 Partial (UT_02, UT_03), 0 Fail, 0 Not executed. Every case was run 4 times with the same result (ST_06, the 10-minute idle case, once).
+- Automated suite: 338 tests pass on Python 3.10, 3.12 and 3.13; flake8 is clean.
+- Line coverage 91.5%, branch coverage 86.1% (targets 80% and 75%).
+- 20 users, 2,000 deliveries: none lost, slowest 61 ms (limit 1 second).
+

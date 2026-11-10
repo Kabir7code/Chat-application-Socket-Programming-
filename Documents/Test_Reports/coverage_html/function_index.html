@@ -1,0 +1,2413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Chat App - code and branch coverage (Sprint 3)</title>
+    <link rel="icon" sizes="32x32" href="favicon_32_cb_c827f16f.png">
+    <link rel="stylesheet" href="style_cb_4667309f.css" type="text/css">
+    <script src="coverage_html_cb_54cfdca1.js" defer></script>
+</head>
+<body class="indexfile">
+<header>
+    <div class="content">
+        <h1>Chat App - code and branch coverage (Sprint 3):
+            <span class="pc_cov">90%</span>
+        </h1>
+        <aside id="help_panel_wrapper">
+            <input id="help_panel_state" type="checkbox">
+            <label for="help_panel_state">
+                <img id="keyboard_icon" src="keybd_closed_cb_900cfef5.png" alt="Show/hide keyboard shortcuts">
+            </label>
+            <div id="help_panel">
+                <p class="legend">Shortcuts on this page</p>
+                <div class="keyhelp">
+                    <p>
+                        <kbd>f</kbd>
+                        <kbd>n</kbd>
+                        <kbd>s</kbd>
+                        <kbd>m</kbd>
+                        <kbd>x</kbd>
+                        <kbd>b</kbd>
+                        <kbd>p</kbd>
+                        <kbd>c</kbd>
+                        &nbsp; change column sorting
+                    </p>
+                    <p>
+                        <kbd>[</kbd>
+                        <kbd>]</kbd>
+                        &nbsp; prev/next file
+                    </p>
+                    <p>
+                        <kbd>?</kbd> &nbsp; show/hide this help
+                    </p>
+                </div>
+            </div>
+        </aside>
+        <form id="filter_container">
+            <input id="filter" type="text" value="" placeholder="filter...">
+            <div>
+                <input id="hide100" type="checkbox" >
+                <label for="hide100">hide covered</label>
+            </div>
+        </form>
+        <h2>
+                <a class="button" href="index.html">Files</a>
+                <a class="button current">Functions</a>
+                <a class="button" href="class_index.html">Classes</a>
+        </h2>
+        <p class="text">
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.17.2">coverage.py v7.17.2</a>,
+            created at 2026-11-10 19:49 +0000
+        </p>
+    </div>
+</header>
+<main id="index">
+    <table class="index" data-sortable>
+        <thead>
+            <tr class="tablehead grouphead">
+                <th class="spacer">&nbsp;</th>
+                <th class="spacer">&nbsp;</th>
+                <th class="spacer">&nbsp;</th>
+                <th class="left" colspan="4">Statements</th>
+                <th class="spacer">&nbsp;</th>
+                <th class="left" colspan="3">Branches</th>
+                <th class="spacer">&nbsp;</th>
+                <th>Total</th>
+            </tr>
+            <tr class="tablehead" title="Click to sort">
+                <th id="file" class="name" aria-sort="none" data-shortcut="f">File<span class="arrows"></span></th>
+                <th id="region" class="name" aria-sort="none" data-default-sort-order="ascending" data-shortcut="n">function<span class="arrows"></span></th>
+                <th class="spacer">&nbsp;</th>
+                <th id="statements_coverage" aria-sort="none" data-default-sort-order="descending">coverage<span class="arrows"></span></th>
+                <th id="statements" aria-sort="none" data-default-sort-order="descending" data-shortcut="s">statements<span class="arrows"></span></th>
+                <th id="missing" aria-sort="none" data-default-sort-order="descending" data-shortcut="m">missing<span class="arrows"></span></th>
+                <th id="excluded" aria-sort="none" data-default-sort-order="descending" data-shortcut="x">excluded<span class="arrows"></span></th>
+                <th class="spacer">&nbsp;</th>
+                <th id="branches_coverage" aria-sort="none" data-default-sort-order="descending">coverage<span class="arrows"></span></th>
+                <th id="branches" aria-sort="none" data-default-sort-order="descending" data-shortcut="b">branches<span class="arrows"></span></th>
+                <th id="partial" aria-sort="none" data-default-sort-order="descending" data-shortcut="p">partial<span class="arrows"></span></th>
+                <th class="spacer">&nbsp;</th>
+                <th id="coverage" aria-sort="none" data-shortcut="c">coverage<span class="arrows"></span></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa___init___py.html">chat<span class="sep">/</span>__init__.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa___init___py.html"><data value=''><span class='no-noun'>(no function)</span></data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_client_py.html#t48">chat<span class="sep">/</span>client.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_client_py.html#t48"><data value='time_prefix'>time_prefix</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="5 5">100%</td>
+                <td>5</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="5 5">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_client_py.html#t58">chat<span class="sep">/</span>client.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_client_py.html#t58"><data value='format_message'>format_message</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="26 27">96%</td>
+                <td>27</td>
+                <td>1</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="17 18">94%</td>
+                <td>18</td>
+                <td>1</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="43 45">96%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_client_py.html#t88">chat<span class="sep">/</span>client.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_client_py.html#t88"><data value='format_private_history'>format_private_history</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="7 7">100%</td>
+                <td>7</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+                <td>4</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="11 11">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_client_py.html#t99">chat<span class="sep">/</span>client.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_client_py.html#t99"><data value='parse_command'>parse_command</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="26 26">100%</td>
+                <td>26</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="20 20">100%</td>
+                <td>20</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="46 46">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_client_py.html#t133">chat<span class="sep">/</span>client.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_client_py.html#t133"><data value='register'>register</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="11 15">73%</td>
+                <td>15</td>
+                <td>4</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 4">50%</td>
+                <td>4</td>
+                <td>2</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="13 19">68%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_client_py.html#t152">chat<span class="sep">/</span>client.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_client_py.html#t152"><data value='receive_loop'>receive_loop</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="3 9">33%</td>
+                <td>9</td>
+                <td>6</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 2">0%</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="3 11">27%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_client_py.html#t164">chat<span class="sep">/</span>client.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_client_py.html#t164"><data value='main'>main</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="17 31">55%</td>
+                <td>31</td>
+                <td>14</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="5 10">50%</td>
+                <td>10</td>
+                <td>5</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="22 41">54%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_client_py.html">chat<span class="sep">/</span>client.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_client_py.html"><data value=''><span class='no-noun'>(no function)</span></data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="16 16">100%</td>
+                <td>16</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="18 18">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_config_py.html#t31">chat<span class="sep">/</span>config.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_config_py.html#t31"><data value='keep_count'>keep_count</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="7 7">100%</td>
+                <td>7</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="9 9">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_config_py.html#t42">chat<span class="sep">/</span>config.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_config_py.html#t42"><data value='parse_args'>parse_args</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="10 10">100%</td>
+                <td>10</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="10 10">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_config_py.html#t96">chat<span class="sep">/</span>config.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_config_py.html#t96"><data value='server_tls'>server_tls</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="6 7">86%</td>
+                <td>7</td>
+                <td>1</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 6">67%</td>
+                <td>6</td>
+                <td>2</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="10 13">77%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_config_py.html#t109">chat<span class="sep">/</span>config.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_config_py.html#t109"><data value='client_tls'>client_tls</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="6 6">100%</td>
+                <td>6</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+                <td>4</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="10 10">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_config_py.html">chat<span class="sep">/</span>config.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_config_py.html"><data value=''><span class='no-noun'>(no function)</span></data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="12 12">100%</td>
+                <td>12</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="12 12">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t28">chat<span class="sep">/</span>groups.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t28"><data value='init__'>GroupError.__init__</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="3 3">100%</td>
+                <td>3</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="3 3">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t35">chat<span class="sep">/</span>groups.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t35"><data value='init__'>Group.__init__</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+                <td>4</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t43">chat<span class="sep">/</span>groups.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t43"><data value='init__'>GroupManager.__init__</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="9 10">90%</td>
+                <td>10</td>
+                <td>1</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="5 6">83%</td>
+                <td>6</td>
+                <td>1</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="14 16">88%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t55">chat<span class="sep">/</span>groups.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t55"><data value='save'>GroupManager._save</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="7 7">100%</td>
+                <td>7</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+                <td>4</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="11 11">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t69">chat<span class="sep">/</span>groups.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t69"><data value='get'>GroupManager._get</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+                <td>4</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="6 6">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t76">chat<span class="sep">/</span>groups.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t76"><data value='create'>GroupManager.create</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="9 9">100%</td>
+                <td>9</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+                <td>4</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="13 13">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t91">chat<span class="sep">/</span>groups.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t91"><data value='join'>GroupManager.join</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="7 7">100%</td>
+                <td>7</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="9 9">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t101">chat<span class="sep">/</span>groups.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t101"><data value='add'>GroupManager.add</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="8 9">89%</td>
+                <td>9</td>
+                <td>1</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="3 4">75%</td>
+                <td>4</td>
+                <td>1</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="11 13">85%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t113">chat<span class="sep">/</span>groups.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t113"><data value='leave'>GroupManager.leave</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 5">80%</td>
+                <td>5</td>
+                <td>1</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 2">50%</td>
+                <td>2</td>
+                <td>1</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="5 7">71%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t125">chat<span class="sep">/</span>groups.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t125"><data value='remove_user'>GroupManager.remove_user</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t137">chat<span class="sep">/</span>groups.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t137"><data value='remove'>GroupManager._remove</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="7 7">100%</td>
+                <td>7</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+                <td>4</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="11 11">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t147">chat<span class="sep">/</span>groups.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t147"><data value='record'>GroupManager.record</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="6 6">100%</td>
+                <td>6</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="3 4">75%</td>
+                <td>4</td>
+                <td>1</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="9 10">90%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t158">chat<span class="sep">/</span>groups.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t158"><data value='history'>GroupManager.history</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="7 7">100%</td>
+                <td>7</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+                <td>4</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="11 11">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t171">chat<span class="sep">/</span>groups.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t171"><data value='members'>GroupManager.members</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t175">chat<span class="sep">/</span>groups.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t175"><data value='is_member'>GroupManager.is_member</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="3 3">100%</td>
+                <td>3</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="3 3">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t180">chat<span class="sep">/</span>groups.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t180"><data value='admin'>GroupManager.admin</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t184">chat<span class="sep">/</span>groups.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t184"><data value='groups_of'>GroupManager.groups_of</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t188">chat<span class="sep">/</span>groups.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html#t188"><data value='names'>GroupManager.names</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html">chat<span class="sep">/</span>groups.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_groups_py.html"><data value=''><span class='no-noun'>(no function)</span></data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="26 26">100%</td>
+                <td>26</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="26 26">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_make_cert_py.html#t21">chat<span class="sep">/</span>make_cert.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_make_cert_py.html#t21"><data value='subject_alt_names'>subject_alt_names</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="10 10">100%</td>
+                <td>10</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="3 4">75%</td>
+                <td>4</td>
+                <td>1</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="13 14">93%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_make_cert_py.html#t34">chat<span class="sep">/</span>make_cert.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_make_cert_py.html#t34"><data value='make_cert'>make_cert</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="6 7">86%</td>
+                <td>7</td>
+                <td>1</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 2">50%</td>
+                <td>2</td>
+                <td>1</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="7 9">78%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_make_cert_py.html#t50">chat<span class="sep">/</span>make_cert.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_make_cert_py.html#t50"><data value='main'>main</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 8">0%</td>
+                <td>8</td>
+                <td>8</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 8">0%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_make_cert_py.html">chat<span class="sep">/</span>make_cert.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_make_cert_py.html"><data value=''><span class='no-noun'>(no function)</span></data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="10 11">91%</td>
+                <td>11</td>
+                <td>1</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 2">50%</td>
+                <td>2</td>
+                <td>1</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="11 13">85%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_protocol_py.html#t32">chat<span class="sep">/</span>protocol.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_protocol_py.html#t32"><data value='encode'>encode</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+                <td>4</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="6 6">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_protocol_py.html#t40">chat<span class="sep">/</span>protocol.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_protocol_py.html#t40"><data value='decode'>decode</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="7 7">100%</td>
+                <td>7</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="9 9">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_protocol_py.html#t51">chat<span class="sep">/</span>protocol.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_protocol_py.html#t51"><data value='send_message'>send_message</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_protocol_py.html#t56">chat<span class="sep">/</span>protocol.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_protocol_py.html#t56"><data value='recv_exact'>_recv_exact</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="9 9">100%</td>
+                <td>9</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+                <td>4</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="13 13">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_protocol_py.html#t69">chat<span class="sep">/</span>protocol.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_protocol_py.html#t69"><data value='recv_message'>recv_message</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="9 10">90%</td>
+                <td>10</td>
+                <td>1</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="5 6">83%</td>
+                <td>6</td>
+                <td>1</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="14 16">88%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_protocol_py.html#t87">chat<span class="sep">/</span>protocol.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_protocol_py.html#t87"><data value='new_message_id'>new_message_id</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_protocol_py.html#t94">chat<span class="sep">/</span>protocol.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_protocol_py.html#t94"><data value='timestamp'>timestamp</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_protocol_py.html#t100">chat<span class="sep">/</span>protocol.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_protocol_py.html#t100"><data value='make_chat_message'>make_chat_message</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_protocol_py.html">chat<span class="sep">/</span>protocol.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_protocol_py.html"><data value=''><span class='no-noun'>(no function)</span></data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="19 19">100%</td>
+                <td>19</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="19 19">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_registry_py.html#t18">chat<span class="sep">/</span>registry.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_registry_py.html#t18"><data value='init__'>Session.__init__</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+                <td>4</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_registry_py.html#t24">chat<span class="sep">/</span>registry.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_registry_py.html#t24"><data value='send'>Session.send</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="9 9">100%</td>
+                <td>9</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="11 11">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_registry_py.html#t36">chat<span class="sep">/</span>registry.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_registry_py.html#t36"><data value='close'>Session.close</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="7 9">78%</td>
+                <td>9</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="7 9">78%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_registry_py.html#t52">chat<span class="sep">/</span>registry.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_registry_py.html#t52"><data value='init__'>SessionRegistry.__init__</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="3 3">100%</td>
+                <td>3</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="3 3">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_registry_py.html#t57">chat<span class="sep">/</span>registry.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_registry_py.html#t57"><data value='connect'>SessionRegistry.connect</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_registry_py.html#t61">chat<span class="sep">/</span>registry.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_registry_py.html#t61"><data value='register'>SessionRegistry.register</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="6 6">100%</td>
+                <td>6</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="8 8">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_registry_py.html#t70">chat<span class="sep">/</span>registry.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_registry_py.html#t70"><data value='disconnect'>SessionRegistry.disconnect</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="6 6">100%</td>
+                <td>6</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="8 8">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_registry_py.html#t79">chat<span class="sep">/</span>registry.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_registry_py.html#t79"><data value='get'>SessionRegistry.get</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_registry_py.html#t83">chat<span class="sep">/</span>registry.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_registry_py.html#t83"><data value='registered'>SessionRegistry.registered</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_registry_py.html#t88">chat<span class="sep">/</span>registry.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_registry_py.html#t88"><data value='usernames'>SessionRegistry.usernames</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_registry_py.html#t92">chat<span class="sep">/</span>registry.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_registry_py.html#t92"><data value='connected'>SessionRegistry.connected</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_registry_py.html">chat<span class="sep">/</span>registry.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_registry_py.html"><data value=''><span class='no-noun'>(no function)</span></data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="16 16">100%</td>
+                <td>16</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="16 16">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t45">chat<span class="sep">/</span>server.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t45"><data value='system_message'>system_message</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t49">chat<span class="sep">/</span>server.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t49"><data value='error_message'>error_message</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t53">chat<span class="sep">/</span>server.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t53"><data value='enable_keepalive'>enable_keepalive</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+                <td>4</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="3 4">75%</td>
+                <td>4</td>
+                <td>1</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="7 8">88%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t65">chat<span class="sep">/</span>server.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t65"><data value='init__'>ChatServer.__init__</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="9 9">100%</td>
+                <td>9</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="9 9">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t87">chat<span class="sep">/</span>server.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t87"><data value='clients'>ChatServer.clients</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t91">chat<span class="sep">/</span>server.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t91"><data value='users'>ChatServer.users</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t95">chat<span class="sep">/</span>server.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t95"><data value='start'>ChatServer.start</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="8 8">100%</td>
+                <td>8</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="8 8">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t106">chat<span class="sep">/</span>server.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t106"><data value='serve_forever'>ChatServer.serve_forever</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 9">0%</td>
+                <td>9</td>
+                <td>9</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 2">0%</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 11">0%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t118">chat<span class="sep">/</span>server.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t118"><data value='stop'>ChatServer.stop</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="6 6">100%</td>
+                <td>6</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="3 4">75%</td>
+                <td>4</td>
+                <td>1</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="9 10">90%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t127">chat<span class="sep">/</span>server.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t127"><data value='accept_loop'>ChatServer._accept_loop</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="8 10">80%</td>
+                <td>10</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 2">50%</td>
+                <td>2</td>
+                <td>1</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="9 12">75%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t139">chat<span class="sep">/</span>server.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t139"><data value='handle_client'>ChatServer._handle_client</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="27 27">100%</td>
+                <td>27</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="6 6">100%</td>
+                <td>6</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="33 33">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t170">chat<span class="sep">/</span>server.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t170"><data value='disconnect'>ChatServer._disconnect</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="9 9">100%</td>
+                <td>9</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="6 6">100%</td>
+                <td>6</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="15 15">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t185">chat<span class="sep">/</span>server.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t185"><data value='dispatch'>ChatServer._dispatch</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="22 22">100%</td>
+                <td>22</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="16 16">100%</td>
+                <td>16</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="38 38">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t211">chat<span class="sep">/</span>server.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t211"><data value='register'>ChatServer._register</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="18 18">100%</td>
+                <td>18</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="8 8">100%</td>
+                <td>8</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="26 26">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t251">chat<span class="sep">/</span>server.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t251"><data value='valid_text'>ChatServer._valid_text</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="7 7">100%</td>
+                <td>7</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+                <td>4</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="11 11">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t262">chat<span class="sep">/</span>server.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t262"><data value='deliver_chat'>ChatServer._deliver_chat</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="7 7">100%</td>
+                <td>7</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="9 9">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t271">chat<span class="sep">/</span>server.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t271"><data value='deliver_private'>ChatServer._deliver_private</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="18 21">86%</td>
+                <td>21</td>
+                <td>3</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="8 10">80%</td>
+                <td>10</td>
+                <td>2</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="26 31">84%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t308">chat<span class="sep">/</span>server.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t308"><data value='create_group'>ChatServer._create_group</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="3 3">100%</td>
+                <td>3</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="3 3">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t314">chat<span class="sep">/</span>server.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t314"><data value='join_group'>ChatServer._join_group</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="5 5">100%</td>
+                <td>5</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="5 5">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t325">chat<span class="sep">/</span>server.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t325"><data value='add_member'>ChatServer._add_member</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="9 9">100%</td>
+                <td>9</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="3 4">75%</td>
+                <td>4</td>
+                <td>1</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="12 13">92%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t337">chat<span class="sep">/</span>server.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t337"><data value='leave_group'>ChatServer._leave_group</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+                <td>4</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t345">chat<span class="sep">/</span>server.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t345"><data value='deliver_group'>ChatServer._deliver_group</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="12 12">100%</td>
+                <td>12</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+                <td>4</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="16 16">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t359">chat<span class="sep">/</span>server.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t359"><data value='send_chat_history'>ChatServer._send_chat_history</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="3 3">100%</td>
+                <td>3</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="5 5">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t366">chat<span class="sep">/</span>server.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t366"><data value='send_private_history'>ChatServer._send_private_history</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="8 8">100%</td>
+                <td>8</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+                <td>4</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="12 12">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t379">chat<span class="sep">/</span>server.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t379"><data value='send_history'>ChatServer._send_history</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="3 3">100%</td>
+                <td>3</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="5 5">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t385">chat<span class="sep">/</span>server.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t385"><data value='group_update_message'>ChatServer._group_update_message</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t389">chat<span class="sep">/</span>server.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t389"><data value='group_update'>ChatServer._group_update</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t393">chat<span class="sep">/</span>server.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t393"><data value='send_to'>ChatServer._send_to</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="6 6">100%</td>
+                <td>6</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="6 6">100%</td>
+                <td>6</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="12 12">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t401">chat<span class="sep">/</span>server.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t401"><data value='broadcast'>ChatServer._broadcast</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+                <td>4</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+                <td>4</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="8 8">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t421">chat<span class="sep">/</span>server.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t421"><data value='setup_logging'>setup_logging</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t427">chat<span class="sep">/</span>server.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html#t427"><data value='main'>main</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="7 7">100%</td>
+                <td>7</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 2">50%</td>
+                <td>2</td>
+                <td>1</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="8 9">89%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html">chat<span class="sep">/</span>server.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_server_py.html"><data value=''><span class='no-noun'>(no function)</span></data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="55 56">98%</td>
+                <td>56</td>
+                <td>1</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 2">50%</td>
+                <td>2</td>
+                <td>1</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="56 58">97%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t73">chat<span class="sep">/</span>storage.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t73"><data value='init__'>MessageStore.__init__</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="9 9">100%</td>
+                <td>9</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="11 11">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t89">chat<span class="sep">/</span>storage.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t89"><data value='save_chat'>MessageStore.save_chat</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t93">chat<span class="sep">/</span>storage.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t93"><data value='save_private'>MessageStore.save_private</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t97">chat<span class="sep">/</span>storage.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t97"><data value='save_group'>MessageStore.save_group</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t101">chat<span class="sep">/</span>storage.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t101"><data value='save'>MessageStore._save</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="9 9">100%</td>
+                <td>9</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="9 9">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t115">chat<span class="sep">/</span>storage.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t115"><data value='trim'>MessageStore._trim</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="9 9">100%</td>
+                <td>9</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="6 6">100%</td>
+                <td>6</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="15 15">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t134">chat<span class="sep">/</span>storage.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t134"><data value='recent_chat'>MessageStore.recent_chat</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t138">chat<span class="sep">/</span>storage.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t138"><data value='private_between'>MessageStore.private_between</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t146">chat<span class="sep">/</span>storage.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t146"><data value='group_messages'>MessageStore.group_messages</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t151">chat<span class="sep">/</span>storage.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t151"><data value='save_group_state'>MessageStore.save_group_state</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="6 9">67%</td>
+                <td>9</td>
+                <td>3</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="6 9">67%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t168">chat<span class="sep">/</span>storage.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t168"><data value='delete_group'>MessageStore.delete_group</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="8 8">100%</td>
+                <td>8</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="8 8">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t178">chat<span class="sep">/</span>storage.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t178"><data value='delete_group_messages'>MessageStore.delete_group_messages</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="7 7">100%</td>
+                <td>7</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="7 7">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t188">chat<span class="sep">/</span>storage.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t188"><data value='load_groups'>MessageStore.load_groups</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="6 6">100%</td>
+                <td>6</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="3 4">75%</td>
+                <td>4</td>
+                <td>1</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="9 10">90%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t200">chat<span class="sep">/</span>storage.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t200"><data value='remember_user'>MessageStore.remember_user</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 7">57%</td>
+                <td>7</td>
+                <td>3</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 7">57%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t210">chat<span class="sep">/</span>storage.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t210"><data value='is_known_user'>MessageStore.is_known_user</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="3 3">100%</td>
+                <td>3</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="3 3">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t215">chat<span class="sep">/</span>storage.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t215"><data value='queue_offline'>MessageStore.queue_offline</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="5 8">62%</td>
+                <td>8</td>
+                <td>3</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="5 8">62%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t229">chat<span class="sep">/</span>storage.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t229"><data value='take_offline'>MessageStore.take_offline</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="5 8">62%</td>
+                <td>8</td>
+                <td>3</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="5 8">62%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t245">chat<span class="sep">/</span>storage.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t245"><data value='waiting_count'>MessageStore.waiting_count</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t251">chat<span class="sep">/</span>storage.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t251"><data value='count'>MessageStore.count</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t255">chat<span class="sep">/</span>storage.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t255"><data value='recent'>MessageStore._recent</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+                <td>4</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t262">chat<span class="sep">/</span>storage.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t262"><data value='close'>MessageStore.close</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t267">chat<span class="sep">/</span>storage.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html#t267"><data value='to_message'>to_message</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="7 7">100%</td>
+                <td>7</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+                <td>4</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="11 11">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html">chat<span class="sep">/</span>storage.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_storage_py.html"><data value=''><span class='no-noun'>(no function)</span></data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="29 29">100%</td>
+                <td>29</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="29 29">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_tls_py.html#t18">chat<span class="sep">/</span>tls.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_tls_py.html#t18"><data value='server_context'>server_context</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+                <td>4</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_tls_py.html#t25">chat<span class="sep">/</span>tls.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_tls_py.html#t25"><data value='client_context'>client_context</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+                <td>4</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_tls_py.html#t32">chat<span class="sep">/</span>tls.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_tls_py.html#t32"><data value='wrap_server_side'>wrap_server_side</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+                <td>4</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_tls_py.html#t45">chat<span class="sep">/</span>tls.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_tls_py.html#t45"><data value='connect'>connect</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="8 8">100%</td>
+                <td>8</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="10 10">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_tls_py.html">chat<span class="sep">/</span>tls.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_tls_py.html"><data value=''><span class='no-noun'>(no function)</span></data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="7 7">100%</td>
+                <td>7</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="7 7">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t55">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t55"><data value='init__'>ConnectError.__init__</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="3 3">100%</td>
+                <td>3</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="3 3">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t61">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t61"><data value='with_display'>with_display</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t69">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t69"><data value='init__'>WebSession.__init__</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="9 9">100%</td>
+                <td>9</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="9 9">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t80">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t80"><data value='send'>WebSession.send</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t84">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t84"><data value='read_loop'>WebSession.read_loop</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="11 11">100%</td>
+                <td>11</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+                <td>4</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="15 15">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t99">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t99"><data value='track_group'>WebSession._track_group</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 3">67%</td>
+                <td>3</td>
+                <td>1</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 2">50%</td>
+                <td>2</td>
+                <td>1</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="3 5">60%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t105">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t105"><data value='echo'>WebSession.echo</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="10 10">100%</td>
+                <td>10</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="6 6">100%</td>
+                <td>6</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="16 16">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t125">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t125"><data value='init__'>ChatGateway.__init__</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="8 8">100%</td>
+                <td>8</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="8 8">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t137">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t137"><data value='start'>ChatGateway.start</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+                <td>4</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t145">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t145"><data value='stop'>ChatGateway.stop</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="6 6">100%</td>
+                <td>6</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="8 8">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t154">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t154"><data value='open_session'>ChatGateway.open_session</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="11 12">92%</td>
+                <td>12</td>
+                <td>1</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 2">50%</td>
+                <td>2</td>
+                <td>1</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="12 14">86%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t169">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t169"><data value='connect_and_register'>ChatGateway._connect_and_register</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="21 27">78%</td>
+                <td>27</td>
+                <td>6</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 6">67%</td>
+                <td>6</td>
+                <td>2</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="25 33">76%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t200">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t200"><data value='get_session'>ChatGateway.get_session</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t204">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t204"><data value='close_session'>ChatGateway.close_session</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="12 14">86%</td>
+                <td>14</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="3 4">75%</td>
+                <td>4</td>
+                <td>1</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="15 18">83%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t221">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t221"><data value='close_if_not_streaming'>ChatGateway._close_if_not_streaming</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="3 3">100%</td>
+                <td>3</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 2">50%</td>
+                <td>2</td>
+                <td>1</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 5">80%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t227">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t227"><data value='forward'>ChatGateway.forward</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="5 5">100%</td>
+                <td>5</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="7 7">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t234">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t234"><data value='run_command'>ChatGateway.run_command</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+                <td>4</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="6 6">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t243">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t243"><data value='make_handler'>make_handler</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="16 16">100%</td>
+                <td>16</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="16 16">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t247">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t247"><data value='log_message'>make_handler.Handler.log_message</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 1">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t251">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t251"><data value='send_json'>make_handler.Handler.send_json</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="6 6">100%</td>
+                <td>6</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="6 6">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t259">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t259"><data value='read_json'>make_handler.Handler.read_json</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="16 21">76%</td>
+                <td>21</td>
+                <td>5</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="5 6">83%</td>
+                <td>6</td>
+                <td>1</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="21 27">78%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t286">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t286"><data value='find_session'>make_handler.Handler.find_session</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+                <td>4</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="6 6">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t293">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t293"><data value='do_GET'>make_handler.Handler.do_GET</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="9 9">100%</td>
+                <td>9</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="6 6">100%</td>
+                <td>6</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="15 15">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t305">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t305"><data value='serve_static'>make_handler.Handler.serve_static</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="10 10">100%</td>
+                <td>10</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="10 10">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t317">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t317"><data value='stream_events'>make_handler.Handler.stream_events</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="28 28">100%</td>
+                <td>28</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="7 8">88%</td>
+                <td>8</td>
+                <td>1</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="35 36">97%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t349">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t349"><data value='do_POST'>make_handler.Handler.do_POST</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="6 8">75%</td>
+                <td>8</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="3 4">75%</td>
+                <td>4</td>
+                <td>1</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="9 12">75%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t364">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t364"><data value='api_connect'>make_handler.Handler.api_connect</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="10 10">100%</td>
+                <td>10</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="12 12">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t381">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t381"><data value='relay'>make_handler.Handler.relay</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="5 7">71%</td>
+                <td>7</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 0">100%</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="5 7">71%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t391">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t391"><data value='api_send'>make_handler.Handler.api_send</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="10 10">100%</td>
+                <td>10</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="6 6">100%</td>
+                <td>6</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="16 16">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t403">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t403"><data value='api_command'>make_handler.Handler.api_command</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="11 14">79%</td>
+                <td>14</td>
+                <td>3</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="6 8">75%</td>
+                <td>8</td>
+                <td>2</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="17 22">77%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t419">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t419"><data value='api_disconnect'>make_handler.Handler.api_disconnect</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="4 4">100%</td>
+                <td>4</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="2 2">100%</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="6 6">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t428">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t428"><data value='parse_args'>parse_args</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="8 9">89%</td>
+                <td>9</td>
+                <td>1</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 2">50%</td>
+                <td>2</td>
+                <td>1</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="9 11">82%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t444">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html#t444"><data value='main'>main</data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 12">0%</td>
+                <td>12</td>
+                <td>12</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 2">0%</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="0 14">0%</td>
+            </tr>
+            <tr class="region">
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html">chat<span class="sep">/</span>web.py</a></td>
+                <td class="name"><a href="z_edc6393af2a8ddaa_web_py.html"><data value=''><span class='no-noun'>(no function)</span></data></a></td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="46 47">98%</td>
+                <td>47</td>
+                <td>1</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1 2">50%</td>
+                <td>2</td>
+                <td>1</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="47 49">96%</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr class="total">
+                <td class="name">Total</td>
+                <td class="name">&nbsp;</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1130 1235">91%</td>
+                <td>1235</td>
+                <td>105</td>
+                <td>0</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="284 330">86%</td>
+                <td>330</td>
+                <td>40</td>
+                <td class="spacer">&nbsp;</td>
+                <td data-ratio="1414 1565">90%</td>
+            </tr>
+        </tfoot>
+    </table>
+    <p id="no_rows">
+        No items found using the specified filter.
+    </p>
+</main>
+<footer>
+    <div class="content">
+        <p>
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.17.2">coverage.py v7.17.2</a>,
+            created at 2026-11-10 19:49 +0000
+        </p>
+    </div>
+    <aside class="hidden">
+        <a id="prevFileLink" class="nav" href=""></a>
+        <a id="nextFileLink" class="nav" href=""></a>
+        <button type="button" class="button_prev_file" data-shortcut="["></button>
+        <button type="button" class="button_next_file" data-shortcut="]"></button>
+        <button type="button" class="button_show_hide_help" data-shortcut="?"></button>
+    </aside>
+</footer>
+</body>
+</html>
