@@ -68,9 +68,11 @@ def format_message(message):
         members = ", ".join(message["members"]) or "none"
         return f"* [{message['group']}] {message['text']} (members: {members})"
     if kind == "private":
-        return f"{when}[private] {message['from']}: {message['text']}"
+        away = " (while you were away)" if message.get("offline") else ""  # FR-012 (#59)
+        return f"{when}[private] {message['from']}{away}: {message['text']}"
     if kind == "private_sent":
-        return f"{when}[private to {message['to']}] {message['text']}"
+        later = " (offline - delivered when they log in)" if message.get("queued") else ""
+        return f"{when}[private to {message['to']}] {message['text']}{later}"
     if kind == "private_history":  # FR-012 (#57)
         return format_private_history(message)
     if kind == "users":

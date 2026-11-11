@@ -9,6 +9,8 @@ Priority: command-line flag > environment variable > default.
 
 The server saves messages in an SQLite file (#55): `--db path` or
 CHAT_DB, default chat.db. `--db :memory:` keeps nothing after it stops.
+Only the newest `--keep` messages (CHAT_KEEP, default 500) of each chat are
+kept; 0 keeps everything (#54).
 
 Traffic is encrypted with TLS by default (NFR-005). Run
 `python -m chat.make_cert` once to create certs/server.crt and server.key.
@@ -23,6 +25,18 @@ DEFAULT_PORT = 5000
 DEFAULT_CERT = os.path.join("certs", "server.crt")
 DEFAULT_KEY = os.path.join("certs", "server.key")
 DEFAULT_DB = "chat.db"
+DEFAULT_KEEP = 500  # NFR-007 (#54): messages kept per chat
+
+
+def keep_count(value):
+    """--keep must be a whole number, 0 or more (0 = keep everything)."""
+    try:
+        number = int(value)
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"'{value}' is not a whole number") from None
+    if number < 0:
+        raise argparse.ArgumentTypeError("must be 0 or more")
+    return number
 
 
 def parse_args(description, argv=None):
@@ -68,6 +82,13 @@ def parse_args(description, argv=None):
         default=os.environ.get("CHAT_DB", DEFAULT_DB),
         help=f"server only: SQLite file for saved messages (env CHAT_DB, default {DEFAULT_DB};"
              " ':memory:' keeps nothing)",
+    )
+    parser.add_argument(
+        "--keep",
+        type=keep_count,
+        default=os.environ.get("CHAT_KEEP", str(DEFAULT_KEEP)),
+        help=f"server only: newest messages kept per chat (env CHAT_KEEP, default "
+             f"{DEFAULT_KEEP}; 0 keeps everything)",
     )
     return parser.parse_args(argv)
 

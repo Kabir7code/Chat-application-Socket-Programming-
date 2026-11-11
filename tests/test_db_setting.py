@@ -33,20 +33,21 @@ def test_main_passes_the_database_to_the_server(monkeypatch, tmp_path, caplog):
     started = {}
 
     class FakeServer:
-        def __init__(self, host, port, tls_context, db_path):
-            started.update(host=host, port=port, tls=tls_context, db=db_path)
+        def __init__(self, host, port, tls_context, db_path, keep):
+            started.update(host=host, port=port, tls=tls_context, db=db_path, keep=keep)
 
         def serve_forever(self):
             pass
 
     monkeypatch.setattr(server, "ChatServer", FakeServer)
     monkeypatch.setattr(server, "setup_logging", lambda: None)
+    monkeypatch.delenv("CHAT_KEEP", raising=False)
     monkeypatch.setattr("sys.argv", ["chat.server", "--no-tls", "--port", "0", "--db", path])
     caplog.set_level(logging.INFO, logger="chat.server")
 
     server.main()
 
-    assert started == {"host": "127.0.0.1", "port": 0, "tls": None, "db": path}
+    assert started == {"host": "127.0.0.1", "port": 0, "tls": None, "db": path, "keep": 500}
     assert f"Saving messages to {path}" in caplog.text
 
 

@@ -63,7 +63,7 @@ def enable_keepalive(conn):
 
 class ChatServer:
     def __init__(self, host=config.DEFAULT_HOST, port=config.DEFAULT_PORT, tls_context=None,
-                 db_path=MEMORY):
+                 db_path=MEMORY, keep=0):
         self.host = host
         self.port = port
         self.tls_context = tls_context  # None = unencrypted (tests, debugging)
@@ -71,7 +71,8 @@ class ChatServer:
         # FR-011 (#50): every delivered message is saved here. The default
         # ":memory:" database is thrown away on exit (tests); pass a file
         # path for messages that survive a restart.
-        self.store = MessageStore(db_path)
+        # NFR-007 (#54): only the newest `keep` messages per chat (0 = all).
+        self.store = MessageStore(db_path, keep=keep)
         # FR-013 (#51): groups are saved in the same database and loaded again here.
         self.groups = GroupManager(self.store)
         # IT_08 (#31): one message is handed to all of its recipients before
@@ -229,6 +230,11 @@ class ChatServer:
                 "users": self.registry.usernames(),
             })
             self._send_chat_history(session)
+            # FR-012 (#59): remember them, and hand over anything sent to
+            # them while they were offline
+            self.store.remember_user(username)
+            for waiting in self.store.take_offline(username):
+                session.send(waiting)
         self._broadcast(
             system_message("join", username, f"{username} joined the chat"),
             exclude=session,
@@ -258,7 +264,6 @@ class ChatServer:
         """FR-005: only the sender and the recipient ever see it."""
         if not self._valid_text(session, text):
             return
-        recipient = self.registry.get(str(recipient_name))
         message_id, sent_at = protocol.new_message_id(), protocol.timestamp()
         message = {
             "type": "private",
@@ -268,12 +273,28 @@ class ChatServer:
             "to": recipient_name,
             "text": text,
         }
-        if recipient is None or not recipient.send(message):
-            session.send(error_message("USER_NOT_FOUND", "User not found/offline"))
-            return
-        self.store.save_private(message)  # only messages that were delivered (#50)
-        session.send({"type": "private_sent", "id": message_id, "time": sent_at,
-                      "to": recipient_name, "text": text})
+        # The lock stops the recipient from logging in between "they are
+        # offline" and "queue it", which would leave the message waiting.
+        with self._delivery_lock:
+            recipient = self.registry.get(str(recipient_name))
+            delivered = recipient is not None and recipient.send(message)
+            queued = False
+            if not delivered:
+                # FR-012 (#59): someone who has used the chat before gets it
+                # the next time they log in
+                if not self.store.is_known_user(str(recipient_name)):
+                    session.send(error_message("USER_NOT_FOUND", "User not found/offline"))
+                    return
+                queued = self.store.queue_offline(message)
+                if not queued:
+                    session.send(error_message("SERVER_ERROR", "Could not save the message."))
+                    return
+            self.store.save_private(message)  # delivered or waiting (#50)
+        sent = {"type": "private_sent", "id": message_id, "time": sent_at,
+                "to": recipient_name, "text": text}
+        if queued:
+            sent["queued"] = True
+        session.send(sent)
 
     # --------------------------------------------------------- groups (FR-004)
     def _create_group(self, session, message):
@@ -400,7 +421,10 @@ def main():
     args = config.parse_args("Run the chat server.")
     tls_context = config.server_tls(args)
     log.info("Saving messages to %s", args.db)
-    ChatServer(args.host, args.port, tls_context, db_path=args.db).serve_forever()
+    if args.keep:
+        log.info("Keeping the newest %d messages of each chat", args.keep)
+    ChatServer(args.host, args.port, tls_context, db_path=args.db,
+               keep=args.keep).serve_forever()
 
 
 if __name__ == "__main__":
