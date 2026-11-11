@@ -1,4 +1,4 @@
-// UML component diagram of the chat application (as built, Sprint 1).
+// UML component diagram of the chat application (as built, Sprint 3: storage added, #58).
 // Render: dot -Tpng -Gdpi=150 components.dot -o ../Component_Diagram.png
 // Notation: box with tabs = component; circle = provided interface; dashed arrow = <<use>>.
 digraph Components {
@@ -19,10 +19,24 @@ digraph Components {
   IConfig   [shape=circle, label="", width=0.25, fixedsize=true, fillcolor="#FFFFFF", xlabel="IConfig"];
 
   // main row: client -> server -> registry
+  Groups    [label="<<component>>\nGroupManager\ngroups.py"];
+  IGroups   [shape=circle, label="", width=0.25, fixedsize=true, fillcolor="#FFFFFF", xlabel="IGroupService"];
+  Storage   [label="<<component>>\nMessageStore\nstorage.py", fillcolor="#CFE8FF"];
+  IStore    [shape=circle, label="", width=0.25, fixedsize=true, fillcolor="#FFFFFF", xlabel="IMessageStore"];
+  Database  [shape=cylinder, label="<<artifact>>\nchat.db\n(SQLite file)", fillcolor="#FFFFFF", width=1.5];
+
   ClientApp -> IChat    [style=dashed, arrowhead=open, label="<<use>>\nTCP"];
   IChat     -> Server   [arrowhead=none];
   Server    -> ISession [style=dashed, arrowhead=open, label="<<use>>"];
   ISession  -> Registry [arrowhead=none];
+
+  // Sprint 3: everything that must survive a restart goes through MessageStore
+  Server    -> IGroups  [style=dashed, arrowhead=open, label="<<use>>"];
+  IGroups   -> Groups   [arrowhead=none];
+  Server    -> IStore   [style=dashed, arrowhead=open, label="<<use>>"];
+  Groups    -> IStore   [style=dashed, arrowhead=open, label="<<use>>"];
+  IStore    -> Storage  [arrowhead=none];
+  Storage   -> Database [style=dashed, arrowhead=open, label="<<read/write>>\nsqlite3"];
 
   // shared library, used by client and server
   IFraming -> Protocol [arrowhead=none];

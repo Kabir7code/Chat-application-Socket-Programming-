@@ -137,6 +137,16 @@ class MessageStore:
             log.exception("Could not delete group %s", name)
             return False
 
+    def delete_group_messages(self, name):
+        """#61: remove every saved message of a group that no longer exists."""
+        try:
+            with self._lock, self._db:
+                self._db.execute("DELETE FROM messages WHERE kind = 'group' AND grp = ?", (name,))
+            return True
+        except sqlite3.Error:
+            log.exception("Could not delete messages of group %s", name)
+            return False
+
     def load_groups(self):
         """Every saved group as {name: (admin, [members in joining order])}."""
         with self._lock:

@@ -284,21 +284,26 @@ class ChatServer:
 
     def _join_group(self, session, message):
         group = str(message.get("group", ""))
-        members = self.groups.join(group, session.username)
-        self._group_update(members, "joined", group, session.username,
-                           f"{session.username} joined {group}")
-        self._send_history(session, group)
+        # #61: joining and reading the history happen under the delivery
+        # lock, so a group message sent at the same moment reaches the new
+        # member once: in the history or live, never both.
+        with self._delivery_lock:
+            members = self.groups.join(group, session.username)
+            self._group_update(members, "joined", group, session.username,
+                               f"{session.username} joined {group}")
+            self._send_history(session, group)
 
     def _add_member(self, session, message):
         group, user = str(message.get("group", "")), str(message.get("username", ""))
         if self.registry.get(user) is None:
             raise GroupError("USER_NOT_FOUND", "User not found/offline")
-        members = self.groups.add(group, session.username, user)
-        self._group_update(members, "added", group, user,
-                           f"{session.username} added {user} to {group}")
-        added = self.registry.get(user)
-        if added is not None:
-            self._send_history(added, group)
+        with self._delivery_lock:  # same reason as in _join_group (#61)
+            members = self.groups.add(group, session.username, user)
+            self._group_update(members, "added", group, user,
+                               f"{session.username} added {user} to {group}")
+            added = self.registry.get(user)
+            if added is not None:
+                self._send_history(added, group)
 
     def _leave_group(self, session, message):
         group = str(message.get("group", ""))
