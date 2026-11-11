@@ -215,7 +215,8 @@ chat/
   make_cert.py  creates the self-signed server certificate
   web.py        web gateway: lets a browser use the chat (python -m chat.web)
   static/       the web page: index.html, app.js, style.css
-tests/          automated tests (pytest)
+tests/          unit and integration tests (pytest)
+system_tests/   system validation tests: the whole app, as a black box
 Documents/      SRS, SAD, use-case diagram and flows, test cases, diagrams
 ```
 
@@ -233,9 +234,23 @@ Documents/      SRS, SAD, use-case diagram and flows, test cases, diagrams
 
 ```bash
 pip install -r requirements-dev.txt
-pytest
-flake8 chat tests
+pytest                                  # unit and integration tests (tests/)
+pytest system_tests -v                  # system validation tests
+flake8 chat tests system_tests
 ```
+
+The two kinds of tests are kept apart on purpose:
+
+- **`tests/`**: unit and integration tests. They import the server's classes and check them directly.
+- **`system_tests/test_system_validation.py`**: system validation. It treats the whole app as a black box: it starts the real server as its own program on a free port with its own database file, talks to it only over the network (or through the real terminal client), and stops and restarts it for the persistence checks. Each test is named after the requirement it validates (`test_FR_001_...` to `test_NFR_007_...`).
+
+Coverage (line and branch):
+
+```bash
+pytest --cov=chat --cov-branch --cov-report=term-missing --cov-report=html
+```
+
+The full test reports are in [Documents/Test_Reports](Documents/Test_Reports).
 
 GitHub Actions runs the same checks on every push and pull request (see `.github/workflows/ci.yml`).
 
