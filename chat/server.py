@@ -229,6 +229,11 @@ class ChatServer:
                 "users": self.registry.usernames(),
             })
             self._send_chat_history(session)
+            # FR-012 (#59): remember them, and hand over anything sent to
+            # them while they were offline
+            self.store.remember_user(username)
+            for waiting in self.store.take_offline(username):
+                session.send(waiting)
         self._broadcast(
             system_message("join", username, f"{username} joined the chat"),
             exclude=session,
@@ -258,7 +263,6 @@ class ChatServer:
         """FR-005: only the sender and the recipient ever see it."""
         if not self._valid_text(session, text):
             return
-        recipient = self.registry.get(str(recipient_name))
         message_id, sent_at = protocol.new_message_id(), protocol.timestamp()
         message = {
             "type": "private",
@@ -268,12 +272,28 @@ class ChatServer:
             "to": recipient_name,
             "text": text,
         }
-        if recipient is None or not recipient.send(message):
-            session.send(error_message("USER_NOT_FOUND", "User not found/offline"))
-            return
-        self.store.save_private(message)  # only messages that were delivered (#50)
-        session.send({"type": "private_sent", "id": message_id, "time": sent_at,
-                      "to": recipient_name, "text": text})
+        # The lock stops the recipient from logging in between "they are
+        # offline" and "queue it", which would leave the message waiting.
+        with self._delivery_lock:
+            recipient = self.registry.get(str(recipient_name))
+            delivered = recipient is not None and recipient.send(message)
+            queued = False
+            if not delivered:
+                # FR-012 (#59): someone who has used the chat before gets it
+                # the next time they log in
+                if not self.store.is_known_user(str(recipient_name)):
+                    session.send(error_message("USER_NOT_FOUND", "User not found/offline"))
+                    return
+                queued = self.store.queue_offline(message)
+                if not queued:
+                    session.send(error_message("SERVER_ERROR", "Could not save the message."))
+                    return
+            self.store.save_private(message)  # delivered or waiting (#50)
+        sent = {"type": "private_sent", "id": message_id, "time": sent_at,
+                "to": recipient_name, "text": text}
+        if queued:
+            sent["queued"] = True
+        session.send(sent)
 
     # --------------------------------------------------------- groups (FR-004)
     def _create_group(self, session, message):

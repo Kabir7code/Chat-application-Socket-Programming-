@@ -98,7 +98,8 @@ def test_private_message_to_user_who_left(server, connect):
     bob.send({"type": "quit"})
     assert wait_until(lambda: "bob" not in server.users)
     alice.send({"type": "private", "to": "bob", "text": "hello?"})
-    assert alice.recv_until("error")["code"] == "USER_NOT_FOUND"
+    # FR-012 (#59): bob has used the chat, so the message waits for him
+    assert alice.recv_until("private_sent")["queued"] is True
 
 
 # ----------------------------------------------------------- #9 thread safety

@@ -50,6 +50,21 @@ CREATE TABLE IF NOT EXISTS group_members (
     position INTEGER NOT NULL,          -- joining order; the admin is first
     PRIMARY KEY (grp, username)
 );
+
+-- FR-012 (#59): private messages for users who are offline
+CREATE TABLE IF NOT EXISTS users (
+    name       TEXT PRIMARY KEY,                  -- everyone who has logged in
+    first_seen TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS offline_messages (
+    id        INTEGER PRIMARY KEY AUTOINCREMENT,  -- delivery order
+    msg_id    INTEGER,
+    time      TEXT    NOT NULL,
+    sender    TEXT    NOT NULL,
+    recipient TEXT    NOT NULL,
+    text      TEXT    NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_offline_recipient ON offline_messages (recipient, id);
 """
 
 
@@ -157,6 +172,58 @@ class MessageStore:
                 if row["grp"] in groups:
                     groups[row["grp"]][1].append(row["username"])
         return groups
+
+    # ------------------------------------------------- offline (FR-012, #59)
+    def remember_user(self, name):
+        """Note that `name` has used the chat, so messages can wait for them."""
+        try:
+            with self._lock, self._db:
+                self._db.execute("INSERT OR IGNORE INTO users (name) VALUES (?)", (name,))
+            return True
+        except sqlite3.Error:
+            log.exception("Could not remember user %s", name)
+            return False
+
+    def is_known_user(self, name):
+        with self._lock:
+            row = self._db.execute("SELECT 1 FROM users WHERE name = ?", (name,)).fetchone()
+        return row is not None
+
+    def queue_offline(self, message):
+        """Keep a private message until its recipient ("to") logs in."""
+        row = (message.get("id"), message.get("time"), message.get("from"),
+               message.get("to"), message.get("text"))
+        try:
+            with self._lock, self._db:
+                self._db.execute(
+                    "INSERT INTO offline_messages (msg_id, time, sender, recipient, text)"
+                    " VALUES (?, ?, ?, ?, ?)", row)
+            return True
+        except sqlite3.Error:
+            log.exception("Could not queue a message for %s", message.get("to"))
+            return False
+
+    def take_offline(self, recipient):
+        """Every message waiting for `recipient`, oldest first. They are
+        removed in the same step, so each one is delivered once only."""
+        try:
+            with self._lock, self._db:
+                rows = self._db.execute(
+                    "SELECT * FROM offline_messages WHERE recipient = ? ORDER BY id",
+                    (recipient,)).fetchall()
+                self._db.execute("DELETE FROM offline_messages WHERE recipient = ?", (recipient,))
+        except sqlite3.Error:
+            log.exception("Could not load waiting messages for %s", recipient)
+            return []
+        return [{"type": "private", "id": row["msg_id"], "time": row["time"],
+                 "from": row["sender"], "to": row["recipient"], "text": row["text"],
+                 "offline": True} for row in rows]
+
+    def waiting_count(self, recipient):
+        with self._lock:
+            return self._db.execute(
+                "SELECT COUNT(*) FROM offline_messages WHERE recipient = ?",
+                (recipient,)).fetchone()[0]
 
     def count(self):
         with self._lock:
