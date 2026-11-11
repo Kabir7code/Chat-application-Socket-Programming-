@@ -11,6 +11,7 @@ The tables are created automatically the first time a database is opened.
 
     store = MessageStore("chat.db")      # a file that survives restarts
     store = MessageStore()               # ":memory:", throwaway (tests)
+    store = MessageStore("chat.db", keep=500)  # newest 500 per chat (#54)
 
 A storage error is logged and reported as False, never raised: a problem
 with the database must not stop messages from being delivered.
@@ -69,8 +70,11 @@ CREATE INDEX IF NOT EXISTS idx_offline_recipient ON offline_messages (recipient,
 
 
 class MessageStore:
-    def __init__(self, path=MEMORY):
+    def __init__(self, path=MEMORY, keep=0):
         self.path = path
+        # NFR-007 (#54): newest messages kept per chat (Everyone, each private
+        # pair, each group); 0 keeps everything
+        self.keep = keep
         self._lock = threading.Lock()
         self._db = sqlite3.connect(path, check_same_thread=False)
         self._db.row_factory = sqlite3.Row
@@ -102,10 +106,29 @@ class MessageStore:
                 self._db.execute(
                     "INSERT INTO messages (msg_id, time, kind, sender, recipient, grp, text)"
                     " VALUES (?, ?, ?, ?, ?, ?, ?)", row)
+                self._trim(kind, message.get("from"), recipient, group)
             return True
         except sqlite3.Error:
             log.exception("Could not save %s message from %s", kind, message.get("from"))
             return False
+
+    def _trim(self, kind, sender, recipient, group):
+        """NFR-007 (#54): delete this chat's messages beyond the newest
+        `keep` (lock held, same transaction as the insert)."""
+        if not self.keep:
+            return
+        if kind == "private":
+            where = ("kind = 'private' AND ((sender = ? AND recipient = ?)"
+                     " OR (sender = ? AND recipient = ?))")
+            params = (sender, recipient, recipient, sender)
+        elif kind == "group":
+            where, params = "kind = 'group' AND grp = ?", (group,)
+        else:
+            where, params = "kind = 'chat'", ()
+        self._db.execute(
+            f"DELETE FROM messages WHERE {where} AND id <= (SELECT id FROM messages"
+            f" WHERE {where} ORDER BY id DESC LIMIT 1 OFFSET ?)",
+            (*params, *params, int(self.keep)))
 
     # ------------------------------------------------------------ loading
     def recent_chat(self, limit=20):
