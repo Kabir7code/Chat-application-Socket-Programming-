@@ -336,7 +336,7 @@ def test_FR_010_group_history_for_new_members(server):
     make_group(alice, "Squad")
     for i in range(12):
         alice.send(type="group", group="Squad", text=f"g{i}")
-    time.sleep(0.5)
+    alice.users()  # answered only after all of alice's earlier messages are handled
     carol.send(type="join_group", group="Squad")
     assert history(carol.drain(0.6)) == [f"g{i}" for i in range(2, 12)]
 
@@ -345,7 +345,7 @@ def test_FR_011_messages_are_saved_and_shown_after_a_restart(server):
     alice = Client(server, "alice")
     for i in range(25):
         alice.send(type="chat", text=f"m{i}")
-    time.sleep(0.5)
+    alice.users()  # answered only after all of alice's earlier messages are handled
     bob = Client(server, "bob")
     assert history(bob.drain(0.6)) == [f"m{i}" for i in range(5, 25)]
     server.restart()
@@ -514,7 +514,7 @@ def test_NFR_007_only_the_newest_messages_are_kept(folder):
         alice = Client(srv, "alice")
         for i in range(8):
             alice.send(type="chat", text=f"m{i}")
-        time.sleep(0.5)
+        alice.users()  # answered only after all of alice's earlier messages are handled
         srv.restart()
         bob = Client(srv, "bob")
         assert history(bob.drain(0.6)) == [f"m{i}" for i in range(3, 8)]
