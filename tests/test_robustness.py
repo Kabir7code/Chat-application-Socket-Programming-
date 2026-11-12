@@ -60,7 +60,8 @@ def test_keepalive_is_enabled_on_client_sockets(server, connect):
     connect("alice")
     assert wait_until(lambda: server.clients)
     conn = server.clients[0].conn
-    assert conn.getsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE) == 1
+    # any non-zero value means "on" (Linux reports 1, macOS reports 8)
+    assert conn.getsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE) != 0
 
 
 # ------------------------------------------------------ #6 private messages
