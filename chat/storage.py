@@ -263,6 +263,15 @@ class MessageStore:
         with self._lock:
             self._db.close()
 
+    def __del__(self):
+        # A store that is dropped without close() (common in tests) still
+        # releases its database connection, instead of leaving it to Python's
+        # clean-up, which prints a ResourceWarning.
+        try:
+            self._db.close()
+        except Exception:  # noqa: BLE001 - never raise while being cleaned up
+            pass
+
 
 def to_message(row):
     """Turn a database row back into the message the protocol uses."""

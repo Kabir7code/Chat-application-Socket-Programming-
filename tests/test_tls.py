@@ -77,6 +77,7 @@ class Tap:
                     s.shutdown(socket.SHUT_RDWR)
                 except OSError:
                     pass
+            src.close()  # each socket is the source of exactly one pipe
 
     def close(self):
         self.listener.close()
