@@ -11,3 +11,7 @@ venv/
 
 # TLS certificates: generate with python -m chat.make_cert, never commit
 certs/
+
+# files sent through the chat (server storage and client downloads)
+*_files/
+downloads/

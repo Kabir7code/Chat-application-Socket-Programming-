@@ -235,6 +235,9 @@ class ChatGateway:
         """Handle a typed line with the terminal client's own parser.
         Returns the text to show locally, if any."""
         message, local_text = client.parse_command(line.strip())
+        if message is not None and message["type"] == "_send_file":
+            # the path would be on the gateway's machine, not the user's
+            return "To send a file from the web page, use the paperclip button."
         if message is not None:
             self.forward(session, message)
         return local_text
@@ -310,7 +313,10 @@ def make_handler(gateway):
             self.send_header("Content-Length", str(len(body)))
             self.send_header("Cache-Control", "no-cache")
             self.send_header("X-Content-Type-Options", "nosniff")
-            self.send_header("Content-Security-Policy", "default-src 'self'")
+            # Shared images and videos are shown from blob: URLs the page
+            # makes itself from the downloaded bytes; nothing else is allowed.
+            self.send_header("Content-Security-Policy",
+                             "default-src 'self'; img-src 'self' blob:; media-src 'self' blob:")
             self.end_headers()
             self.wfile.write(body)
 

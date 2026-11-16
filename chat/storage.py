@@ -17,6 +17,7 @@ A storage error is logged and reported as False, never raised: a problem
 with the database must not stop messages from being delivered.
 """
 
+import json
 import logging
 import sqlite3
 import threading
@@ -57,6 +58,19 @@ CREATE TABLE IF NOT EXISTS users (
     name       TEXT PRIMARY KEY,                  -- everyone who has logged in
     first_seen TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+-- Sending files: one row per uploaded file (the bytes are in a folder
+-- next to the database, under the random id)
+CREATE TABLE IF NOT EXISTS files (
+    id        TEXT PRIMARY KEY,                   -- random, 32 hex characters
+    kind      TEXT    NOT NULL,                   -- image / document / video
+    name      TEXT    NOT NULL,                   -- the original (cleaned) name
+    size      INTEGER NOT NULL,
+    sender    TEXT    NOT NULL,
+    context   TEXT    NOT NULL,                   -- general / private / group
+    recipient TEXT,                               -- private files only
+    grp       TEXT,                               -- group files only
+    time      TEXT    NOT NULL
+);
 CREATE TABLE IF NOT EXISTS offline_messages (
     id        INTEGER PRIMARY KEY AUTOINCREMENT,  -- delivery order
     msg_id    INTEGER,
@@ -84,6 +98,11 @@ class MessageStore:
                 # leave the file half-written.
                 self._db.execute("PRAGMA journal_mode=WAL")
             self._db.executescript(SCHEMA)
+            # Files: messages that carry a file keep its details here. Added
+            # after Sprint 3, so older databases get the column now.
+            columns = {row[1] for row in self._db.execute("PRAGMA table_info(messages)")}
+            if "file" not in columns:
+                self._db.execute("ALTER TABLE messages ADD COLUMN file TEXT")
 
     # ------------------------------------------------------------- saving
     def save_chat(self, message):
@@ -99,13 +118,14 @@ class MessageStore:
         return self._save("group", message, group=message.get("group"))
 
     def _save(self, kind, message, recipient=None, group=None):
+        attached = message.get("file")
         row = (message.get("id"), message.get("time"), kind, message.get("from"),
-               recipient, group, message.get("text"))
+               recipient, group, message.get("text"), json.dumps(attached) if attached else None)
         try:
             with self._lock, self._db:
                 self._db.execute(
-                    "INSERT INTO messages (msg_id, time, kind, sender, recipient, grp, text)"
-                    " VALUES (?, ?, ?, ?, ?, ?, ?)", row)
+                    "INSERT INTO messages (msg_id, time, kind, sender, recipient, grp, text, file)"
+                    " VALUES (?, ?, ?, ?, ?, ?, ?, ?)", row)
                 self._trim(kind, message.get("from"), recipient, group)
             return True
         except sqlite3.Error:
@@ -248,6 +268,33 @@ class MessageStore:
                 "SELECT COUNT(*) FROM offline_messages WHERE recipient = ?",
                 (recipient,)).fetchone()[0]
 
+    # ------------------------------------------------------------ files
+    def save_file(self, info):
+        """Remember an uploaded file: id, kind, name, size, sender, context,
+        recipient (private) or group (group), time."""
+        try:
+            with self._lock, self._db:
+                self._db.execute(
+                    "INSERT INTO files"
+                    " (id, kind, name, size, sender, context, recipient, grp, time)"
+                    " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    (info["id"], info["kind"], info["name"], info["size"], info["sender"],
+                     info["context"], info.get("recipient"), info.get("group"), info["time"]))
+            return True
+        except sqlite3.Error:
+            log.exception("Could not save file %s", info.get("name"))
+            return False
+
+    def get_file(self, file_id):
+        """The details of an uploaded file as a dict, or None."""
+        with self._lock:
+            row = self._db.execute("SELECT * FROM files WHERE id = ?", (str(file_id),)).fetchone()
+        if row is None:
+            return None
+        info = dict(row)
+        info["group"] = info.pop("grp")
+        return info
+
     def count(self):
         with self._lock:
             return self._db.execute("SELECT COUNT(*) FROM messages").fetchone()[0]
@@ -282,4 +329,9 @@ def to_message(row):
         message.update(type="chat", context="group", group=row["grp"])
     else:
         message.update(type="chat", context="general")
+    if "file" in row.keys() and row["file"]:
+        # a file message: same chat, but type "file" with the file's details
+        message.update(type="file", file=json.loads(row["file"]))
+        if row["kind"] == "private":
+            message["context"] = "private"
     return message
