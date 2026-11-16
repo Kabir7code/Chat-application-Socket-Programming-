@@ -4,7 +4,7 @@ Real-Time Chat Application Using Socket Programming. Software Engineering (UE23C
 
 This file lists every place where the build differs from the SRS, the SAD, the Test Cases or the sprint process in the deliverables sheet, and why. It is updated at the end of each sprint and is what we will walk through in the final demo.
 
-Last updated: 11 Nov 2026, after Sprint 3 and the Part-3 testing (sections 5 to 8). Sections 1 to 4 are the Sprint 1 entries; their current status is in section 5.
+Last updated: 17 Nov 2026 (section 9: documents moved to the course templates, file sharing). Before that: 11 Nov 2026, after Sprint 3 and the Part-3 testing (sections 5 to 8). Sections 1 to 4 are the Sprint 1 entries; their current status is in section 5.
 
 ## 1. Process
 
@@ -59,7 +59,7 @@ Full results are in the Test Cases document: 42 Pass, 4 Partial, 5 Fail, 15 Not 
 
 | # | Deviation | Reason | Action |
 |---|---|---|---|
-| S1 | Requirements FR-011 (saved messages and history on login), FR-012 (private history, offline messages), FR-013 (groups survive a restart), NFR-006 (data survives a restart) and NFR-007 (database size kept in check) were added to the backlog (#50 to #61). They are not in the SRS document. | Part-3 allows an extra sprint; the team used it to make the chat persistent, which the SRS had left out. | Traced and validated in the System Validation Report and the Test Cases document. |
+| S1 | Requirements FR-011 (saved messages and history on login), FR-012 (private history, offline messages), FR-013 (groups survive a restart), NFR-006 (data survives a restart) and NFR-007 (database size kept in check) were added to the backlog (#50 to #61). They were not in the SRS document. | Part-3 allows an extra sprint; the team used it to make the chat persistent, which the SRS had left out. | Traced and validated in the System Validation Report and the Test Cases document. Added to SRS v2.0 (17 Nov 2026). |
 | S2 | IT_16 changed: a private message to someone who has used the chat but is offline is now kept and delivered at their next login, instead of returning "User not found/offline". | Intended behaviour of FR-012 (#59). | Test case updated. A name that never logged in still gets the error (UT_14). |
 | S3 | The "Testing" week in the Part-3 sheet (2 to 6 Nov) overlapped Sprint 3 (5 to 11 Nov). | Sprint 3 changed the same features, so testing them before it finished would have had to be redone. | All 88 test cases were run on the complete Sprint 3 code on 11 Nov; the Test Plan schedule records this. |
 | S4 | Several Sprint 3 uploads put their files at the top of the repository instead of in `chat/`, `tests/` or `Documents/` (PRs #66, #67, #68, #69, #70). The app did not use those files. | Files were dragged into GitHub's upload page one by one instead of as folders. | #66 and #67 were fixed before merging; #69 and #70 are fixed by PR #71. #53 (PR #68) must be uploaded again. The upload instructions now say to drag the folders and check the paths before committing. |
@@ -82,3 +82,10 @@ Full results are in the Test Cases document and `Documents/Test_Reports/`:
 - Line coverage 91.5%, branch coverage 86.1% (targets 80% and 75%).
 - 20 users, 2,000 deliveries: none lost, slowest 61 ms (limit 1 second).
 
+## 9. After Sprint 3 (17 Nov 2026)
+
+| # | Deviation | Reason | Action |
+|---|---|---|---|
+| A1 | The SRS, SAD and Test Plan were rewritten in the course templates (version 2.0). Requirement IDs are unchanged (FR-001 to FR-013, NFR-001 to NFR-007); FR-014 (web page, built in Sprint 2 as #16) is now written down as a requirement. | The templates were shared after the documents were first written. | SRS v2.0 adds security objectives, 15 security requirements, two use case diagrams and the RTM; SAD v2.0 adds three sequence diagrams, API design and a STRIDE threat model. |
+| A2 | File sharing (FR-015, FR-016, SR-14, SR-15) was added after Sprint 3 and is not part of any sprint. | Requested by the team for the final demo. | To be tracked as one issue with no sprint set, so the Sprint 3 burndown is unchanged. Covered by 56 automated tests (tests/test_files.py, tests/test_files_web.py). Limits: images 5 MB, documents 10 MB, videos 25 MB. |
+| A3 | The web history feature (#53) uploaded in PR #68 is restored in the same branch. | PR #68 put its files at the repository root (S4), so the feature had never reached the app. | Changes applied to chat/server.py, chat/static/app.js and tests/test_web_history.py. |
