@@ -17,6 +17,21 @@ digraph Tables {
       <tr><td align="left">recipient</td><td align="left">TEXT, private only</td></tr>
       <tr><td align="left">grp</td><td align="left">TEXT, group only</td></tr>
       <tr><td align="left">text</td><td align="left">TEXT</td></tr>
+      <tr><td align="left">file</td><td align="left" port="file">TEXT, JSON file details (file messages)</td></tr>
+    </table>>];
+
+  files [label=<
+    <table border="0" cellborder="1" cellspacing="0" cellpadding="5">
+      <tr><td bgcolor="#E6E0F8" colspan="2"><b>files</b> (file sharing)</td></tr>
+      <tr><td align="left" port="id"><u>id</u></td><td align="left">TEXT, random 32 hex = name in chat_files/</td></tr>
+      <tr><td align="left">kind</td><td align="left">'image' | 'document' | 'video'</td></tr>
+      <tr><td align="left">name</td><td align="left">TEXT, cleaned original name</td></tr>
+      <tr><td align="left">size</td><td align="left">INTEGER, bytes</td></tr>
+      <tr><td align="left">sender</td><td align="left">TEXT</td></tr>
+      <tr><td align="left">context</td><td align="left">'general' | 'private' | 'group'</td></tr>
+      <tr><td align="left">recipient</td><td align="left">TEXT, private only</td></tr>
+      <tr><td align="left">grp</td><td align="left">TEXT, group only</td></tr>
+      <tr><td align="left">time</td><td align="left">TEXT</td></tr>
     </table>>];
 
   groups [label=<
@@ -53,5 +68,6 @@ digraph Tables {
     </table>>];
 
   group_members:grp:e -> groups:name:w [arrowhead=tee, arrowtail=crow, dir=both, label="many to one\nON DELETE CASCADE"];
+  messages:file:e -> files:id:w [style=dashed, arrowhead=open, label="refers to"];
   offline_messages:recipient:e -> users:name:w [style=dashed, arrowhead=open, label="waits for"];
 }

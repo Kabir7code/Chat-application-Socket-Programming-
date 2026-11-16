@@ -1,8 +1,8 @@
-// UML component diagram of the chat application (as built, Sprint 3: storage added, #58).
+// UML component diagram of the chat application (as built: Sprint 3 storage #58, web gateway #16, file sharing).
 // Render: dot -Tpng -Gdpi=150 components.dot -o ../Component_Diagram.png
 // Notation: box with tabs = component; circle = provided interface; dashed arrow = <<use>>.
 digraph Components {
-  graph [rankdir=LR, fontname="Helvetica", fontsize=20, labelloc=t, pad=0.5, nodesep=0.7, ranksep=1.0, bgcolor=white, newrank=true,
+  graph [rankdir=TB, fontname="Helvetica", fontsize=20, labelloc=t, pad=0.5, nodesep=0.7, ranksep=1.0, bgcolor=white, newrank=true,
          label="UML Component Diagram: Real-Time Chat Application\n "];
   node  [shape=component, style=filled, fillcolor="#FFF2B3", fontname="Helvetica", fontsize=12, color="#222222", margin="0.25,0.12", width=1.9];
   edge  [fontname="Helvetica", fontsize=10, color="#222222"];
@@ -23,6 +23,14 @@ digraph Components {
   IGroups   [shape=circle, label="", width=0.25, fixedsize=true, fillcolor="#FFFFFF", xlabel="IGroupService"];
   Storage   [label="<<component>>\nMessageStore\nstorage.py", fillcolor="#CFE8FF"];
   IStore    [shape=circle, label="", width=0.25, fixedsize=true, fillcolor="#FFFFFF", xlabel="IMessageStore"];
+  Files     [label="<<component>>\nFileStore\nfiles.py", fillcolor="#CFE8FF"];
+  IFiles    [shape=circle, label="", width=0.25, fixedsize=true, fillcolor="#FFFFFF", xlabel="IFileStore"];
+  Folder    [shape=folder, label="<<artifact>>\nchat_files/\n(uploaded files)", fillcolor="#FFFFFF", width=1.5];
+  Browser   [label="<<component>>\nWeb page\nstatic/ (HTML, JS, CSS)", fillcolor="#E6F4EA"];
+  IHttp     [shape=circle, label="", width=0.25, fixedsize=true, fillcolor="#FFFFFF", xlabel="HTTP + SSE"];
+  Gateway   [label="<<component>>\nWebGateway\nweb.py", fillcolor="#E6F4EA"];
+  Tls       [label="<<component>>\nTLS\ntls.py"];
+  ITls      [shape=circle, label="", width=0.25, fixedsize=true, fillcolor="#FFFFFF", xlabel="ITls"];
   Database  [shape=cylinder, label="<<artifact>>\nchat.db\n(SQLite file)", fillcolor="#FFFFFF", width=1.5];
 
   ClientApp -> IChat    [style=dashed, arrowhead=open, label="<<use>>\nTCP"];
@@ -38,6 +46,16 @@ digraph Components {
   IStore    -> Storage  [arrowhead=none];
   Storage   -> Database [style=dashed, arrowhead=open, label="<<read/write>>\nsqlite3"];
 
+  // file sharing: uploads are kept in a folder next to chat.db
+  Server    -> IFiles   [style=dashed, arrowhead=open, label="<<use>>"];
+  IFiles    -> Files    [arrowhead=none];
+  Files     -> Folder   [style=dashed, arrowhead=open, label="<<read/write>>"];
+
+  // web UI (#16): the browser talks HTTP to the gateway, which is one more chat client
+  Browser   -> IHttp    [style=dashed, arrowhead=open, label="<<use>>"];
+  IHttp     -> Gateway  [arrowhead=none];
+  Gateway   -> IChat    [style=dashed, arrowhead=open, label="<<use>>\nTCP"];
+
   // shared library, used by client and server
   IFraming -> Protocol [arrowhead=none];
   IConfig  -> Config   [arrowhead=none];
@@ -46,6 +64,11 @@ digraph Components {
   ClientApp -> IConfig  [style=dashed, arrowhead=open];
   Server    -> IConfig  [style=dashed, arrowhead=open, constraint=false];
 
-  {rank=same; IChat; IFraming; IConfig}
-  {rank=same; Server; Protocol; Config}
+  ITls     -> Tls      [arrowhead=none];
+  ClientApp -> ITls     [style=dashed, arrowhead=open, constraint=false];
+  Server    -> ITls     [style=dashed, arrowhead=open, constraint=false];
+
+  {rank=same; ClientApp; Gateway}
+  {rank=same; IChat; IFraming; IConfig; ITls}
+  {rank=same; Server; Protocol; Config; Tls}
 }

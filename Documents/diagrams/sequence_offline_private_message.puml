@@ -1,0 +1,50 @@
+@startuml
+' Sequence diagram 2: private message to a user who is offline (FR-005, FR-012)
+title Sequence 2: Private message to an offline user, delivered at login
+skinparam shadowing false
+skinparam sequenceMessageAlign left
+skinparam ParticipantBackgroundColor #FFF2B3
+skinparam DatabaseBackgroundColor #CFE8FF
+actor Alice
+participant "Alice's client" as CA
+participant "ChatServer\n(server.py)" as S
+database "MessageStore\n(chat.db)" as DB
+participant "Bob's client" as CB
+actor Bob
+
+Alice -> CA : /msg bob see you later
+CA -> S : private {to: "bob", text}
+S -> S : is bob online?
+group delivery lock
+alt bob is online
+  S -> CB : private {from: alice, text}
+  S -> DB : save_private(message)
+  S --> CA : private_sent
+else bob has logged in before but is offline now
+  S -> DB : is_known_user("bob") -> True
+  S -> DB : queue_offline(message)
+  S -> DB : save_private(message)
+  S --> CA : private_sent {queued: true}
+  CA --> Alice : "[private to bob] see you later"
+else bob never logged in
+  S -> DB : is_known_user("bob") -> False
+  S --> CA : error USER_NOT_FOUND
+  CA --> Alice : "! User not found/offline"
+end
+end
+
+== later ==
+Bob -> CB : start client, log in as "bob"
+CB -> S : register {username: "bob"}
+S --> CB : registered
+S -> DB : take_offline("bob")
+DB --> S : waiting messages (removed from the queue)
+S --> CB : private {from: alice, text, offline: true}
+CB --> Bob : "[private] alice: see you later (while you were away)"
+
+Bob -> CB : /history alice
+CB -> S : private_history {with: "alice"}
+S -> DB : private_between("bob", "alice", 20)
+DB --> S : last 20 messages
+S --> CB : private_history {messages}
+@enduml

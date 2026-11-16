@@ -1,0 +1,37 @@
+@startuml
+' Use case diagram 2: saved history, offline messages, web UI and file sharing
+title Use Case Diagram 2: History, offline messages and file sharing
+left to right direction
+skinparam shadowing false
+skinparam usecaseBackgroundColor #CFE8FF
+skinparam usecaseBorderColor #333333
+actor User
+actor "Recipient" as Rec
+actor "Server" as Server <<system>>
+
+rectangle "Real-Time Chat Application" {
+  usecase "UC-10 See recent chat on login" as UC10
+  usecase "UC-11 View private history\n(/history)" as UC11
+  usecase "UC-12 Message an offline user" as UC12
+  usecase "UC-13 Receive messages\nsent while away" as UC13
+  usecase "UC-14 Chat from the web page" as UC14
+  usecase "UC-15 Send a file\n(everyone, private, group)" as UC15
+  usecase "Check file type and size" as CHK
+  usecase "UC-16 View / download a file" as UC16
+  usecase "Check access to the file" as ACC
+  usecase "Save messages, groups\nand files" as SAVE
+}
+User --> UC10
+User --> UC11
+User --> UC12
+User --> UC14
+User --> UC15
+Rec --> UC13
+Rec --> UC16
+UC15 ..> CHK : <<include>>
+UC16 ..> ACC : <<include>>
+UC12 ..> SAVE : <<include>>
+UC15 ..> SAVE : <<include>>
+UC13 ..> UC10 : <<extend>>
+Server --> SAVE
+@enduml
