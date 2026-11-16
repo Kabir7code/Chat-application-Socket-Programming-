@@ -1461,7 +1461,8 @@ def st_19():
         wait_until(lambda: srv.store.count() == 1)
     with server() as srv:
         mem = srv.store.count()
-    ok = created and "Saving messages to" in line and mem == 0 and len(tables) == 5
+    expected = {"group_members", "groups", "messages", "offline_messages", "users", "files"}
+    ok = created and "Saving messages to" in line and mem == 0 and set(tables) == expected
     shown = line.split("INFO", 1)[-1].strip(" :") if line else ""
     shown = shown.replace(folder, "<tmp>")
     return (f"The server logged '{shown}' and created the file with tables {tables}. With --db :memory: "
