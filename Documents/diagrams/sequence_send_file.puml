@@ -28,8 +28,9 @@ else allowed
   CA -> S : file_end {upload}
   S -> F : end_upload() -> size must match, file kept under its id
   group delivery lock
-    S -> DB : save message + file details
+    S -> DB : save_group(file message)
     S -> CB : file {id, from: alice, group: Squad, file {kind, name, size}}
+    S -> DB : save_file(file details)
   end
   S --> CA : file_sent {upload}
 end

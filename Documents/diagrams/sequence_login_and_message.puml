@@ -14,10 +14,12 @@ database "MessageStore\n(chat.db)" as DB
 participant "Other clients" as O
 
 Alice -> C : start client, type "alice"
-C -> S : TCP connect + TLS handshake (TLS 1.2+, 10 s limit)
-S -> S : start handler thread, enable keepalive
+C -> S : TCP connect
+S -> S : enable keepalive, start handler thread
+C -> S : TLS handshake (TLS 1.2+, 10 s limit)
 C -> S : register {username: "alice"}
 S -> S : validate name (1-20 letters, digits, _)
+group delivery lock
 S -> R : register(session, "alice")
 alt name already online
   R --> S : False
@@ -25,13 +27,15 @@ alt name already online
   C --> Alice : "! Username already taken."
 else name free
   R --> S : True
-  S -> DB : remember_user("alice")
+  S --> C : registered {username, users}
   S -> DB : recent_chat(20)
   DB --> S : saved messages
-  S --> C : registered {username, users}
   S --> C : saved messages, marked "(earlier)"
-  S -> O : system "alice joined the chat"
+  S -> DB : remember_user("alice"), take_offline("alice")
+  S --> C : messages sent while away (if any)
 end
+end
+S -> O : system "alice joined the chat"
 
 Alice -> C : type "hi everyone"
 C -> S : chat {text: "hi everyone"}
