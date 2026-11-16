@@ -11,6 +11,8 @@ Every delivered chat, private and group message is saved in an SQLite
 database (FR-011, #50) so it survives a server restart.
 """
 
+import base64
+import binascii
 import logging
 import os
 import re
@@ -18,7 +20,7 @@ import socket
 import threading
 import time
 
-from chat import config, protocol, tls
+from chat import config, files, protocol, tls
 from chat.groups import GroupError, GroupManager
 from chat.registry import Session, SessionRegistry
 from chat.storage import MEMORY, MessageStore
@@ -75,6 +77,8 @@ class ChatServer:
         self.store = MessageStore(db_path, keep=keep)
         # FR-013 (#51): groups are saved in the same database and loaded again here.
         self.groups = GroupManager(self.store)
+        # Sending files: uploaded files live in a folder next to the database.
+        self.files = files.FileStore(db_path)
         # IT_08 (#31): one message is handed to all of its recipients before
         # the next one starts, so everyone sees messages in the same order.
         # Re-entrant because a group update can be sent while already holding it.
@@ -122,6 +126,7 @@ class ChatServer:
         for session in self.registry.connected():
             session.close()
         self.store.close()
+        self.files.close()
 
     # -------------------------------------------------------------- workers
     def _accept_loop(self):
@@ -170,6 +175,7 @@ class ChatServer:
     def _disconnect(self, session):
         was_registered = self.registry.disconnect(session)
         session.close()
+        self.files.abort(id(session))  # throw away files it was still sending
         if was_registered:
             name = session.username
             log.info("%s left", name)
@@ -200,6 +206,19 @@ class ChatServer:
             session.send({"type": "users", "users": self.registry.usernames()})
         elif kind == "private_history":  # FR-012 (#57)
             self._send_private_history(session, message.get("with"))
+        elif kind in FILE_HANDLERS:
+            try:
+                FILE_HANDLERS[kind](self, session, message)
+            except files.FileRejected as exc:
+                reply = error_message(exc.code, exc.message)
+                if "upload" in message:
+                    reply["upload"] = message["upload"]
+                    self.files.abort(id(session), str(message["upload"]))
+                session.send(reply)
+            except GroupError as exc:
+                if "upload" in message:
+                    self.files.abort(id(session), str(message["upload"]))
+                session.send(error_message(exc.code, exc.message))
         elif kind in GROUP_HANDLERS:
             try:
                 GROUP_HANDLERS[kind](self, session, message)
@@ -348,6 +367,96 @@ class ChatServer:
             self.store.save_group(chat)
             self._send_to(self.groups.members(group), chat, exclude=session.username)
 
+    # ------------------------------------------------------- sending files
+    def _file_target(self, session, message):
+        """Where a file goes: ("general", None), ("private", user) or ("group", name)."""
+        context = message.get("context", "general")
+        if context == "general":
+            return "general", None
+        if context == "private":
+            user = str(message.get("to", ""))
+            if self.registry.get(user) is None:
+                raise files.FileRejected("USER_NOT_FOUND", "User not found/offline")
+            return "private", user
+        if context == "group":
+            group = str(message.get("group", ""))
+            if not self.groups.is_member(group, session.username):
+                self.groups.members(group)  # raises GROUP_NOT_FOUND if it does not exist
+                raise GroupError("NOT_A_MEMBER", f"You are not a member of '{group}'.")
+            return "group", group
+        raise files.FileRejected("BAD_UPLOAD", "context must be general, private or group.")
+
+    def _file_start(self, session, message):
+        token = str(message.get("upload", ""))[:40]
+        if not token:
+            raise files.FileRejected("BAD_UPLOAD", "An upload needs an id.")
+        kind, name = files.check(message.get("name", ""), message.get("size"))
+        target = self._file_target(session, message)
+        self.files.start(id(session), token, kind, name, message["size"], target)
+        session.send({"type": "file_ready", "upload": token})
+
+    def _file_chunk(self, session, message):
+        token = str(message.get("upload", ""))
+        upload = self.files.get_upload(id(session), token)
+        if upload is None:
+            return  # the upload was refused or cancelled; the sender was told
+        try:
+            data = base64.b64decode(str(message.get("data", "")), validate=True)
+        except (binascii.Error, ValueError):
+            raise files.FileRejected("BAD_UPLOAD", "A piece of the file was not valid base64.")
+        upload.write(data)
+
+    def _file_end(self, session, message):
+        token = str(message.get("upload", ""))
+        upload = self.files.end_upload(id(session), token)
+        if upload is None:
+            return
+        context, where = upload.target
+        details = {"id": upload.file_id, "kind": upload.kind, "name": upload.name,
+                   "size": upload.size}
+        shared = {"type": "file", "id": protocol.new_message_id(), "time": protocol.timestamp(),
+                  "from": session.username, "file": details, "context": context,
+                  "text": files.describe(upload.kind, upload.name, upload.size)}
+        with self._delivery_lock:  # saved in the same order everyone sees it
+            if context == "general":
+                self.store.save_chat(shared)
+                self._broadcast(shared, exclude=session)
+            elif context == "private":
+                shared["to"] = where
+                self.store.save_private(shared)
+                recipient = self.registry.get(where)
+                if recipient is not None:
+                    recipient.send(shared)
+            else:
+                shared["group"] = where
+                self.store.save_group(shared)
+                self._send_to(self.groups.members(where), shared, exclude=session.username)
+            self.store.save_file({**details, "sender": session.username, "context": context,
+                                  "recipient": where if context == "private" else None,
+                                  "group": where if context == "group" else None,
+                                  "time": shared["time"]})
+        log.info("%s sent %s %s (%d bytes) to %s", session.username, upload.kind, upload.name,
+                 upload.size, where or "everyone")
+        session.send({**shared, "type": "file_sent", "upload": token})
+
+    def _file_get(self, session, message):
+        info = self.store.get_file(message.get("id"))
+        allowed = info is not None and (
+            info["context"] == "general"
+            or session.username == info["sender"]
+            or (info["context"] == "private" and session.username == info["recipient"])
+            or (info["context"] == "group"
+                and self.groups.is_member(info["group"], session.username)))
+        if not allowed or not os.path.exists(self.files.path(info["id"])):
+            raise files.FileRejected("FILE_NOT_FOUND", "File not found.")
+        file_id = info["id"]
+        session.send({"type": "file_data_start", "id": file_id, "kind": info["kind"],
+                      "name": info["name"], "size": info["size"]})
+        for seq, data in enumerate(self.files.read_chunks(file_id)):
+            if not session.send({"type": "file_data", "id": file_id, "seq": seq, "data": data}):
+                return  # the requester went away
+        session.send({"type": "file_data_end", "id": file_id})
+
     def _send_chat_history(self, session):
         """FR-011 (#56): show a new user the last Everyone messages, oldest
         first, including ones saved before a server restart."""
@@ -400,6 +509,13 @@ class ChatServer:
                 if session is not exclude:
                     session.send(message)
 
+
+FILE_HANDLERS = {
+    "file_start": ChatServer._file_start,
+    "file_chunk": ChatServer._file_chunk,
+    "file_end": ChatServer._file_end,
+    "file_get": ChatServer._file_get,
+}
 
 GROUP_HANDLERS = {
     "create_group": ChatServer._create_group,

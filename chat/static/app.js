@@ -19,6 +19,7 @@ const state = {
   followNextSend: false, // a typed /msg or /g opens the chat it went to
   connected: false,
   activity: 0, // increases with each message, to sort chats by most recent
+  uploads: new Map(), // upload id -> { key, item } while a file is being sent
 };
 
 // ------------------------------------------------------------------- API
@@ -178,7 +179,22 @@ function handleEvent(message) {
     case "chat":
       addChatMessage(message);
       break;
+    case "file":
+      addFileMessage(message, message.from === state.username);
+      break;
+    case "file_sent":
+      endUpload(message.upload);
+      addFileMessage(message, true);
+      break;
+    case "file_ready":
+      break;
+    case "file_data_start":
+    case "file_data":
+    case "file_data_end":
+      receiveFileData(message);
+      break;
     case "error":
+      if (message.upload) endUpload(message.upload);
       state.followNextSend = false;
       addToActive({ kind: "error", text: message.message });
       break;
@@ -212,6 +228,7 @@ function bubble(message, mine) {
     time: clockTime(message.time),
     history: Boolean(message.history),
     title: message.display,
+    file: message.file,
   };
 }
 
@@ -359,7 +376,8 @@ function messageRow(item, previous) {
     sender.style.color = NAME_COLOURS[hashOf(item.from) % NAME_COLOURS.length];
     box.append(sender);
   }
-  box.append(document.createTextNode(item.text), element("span", "time", item.time));
+  box.append(item.file ? fileBox(item.file) : document.createTextNode(item.text),
+    element("span", "time", item.time));
   row.append(box);
   return row;
 }
@@ -520,3 +538,194 @@ $("add-member").addEventListener("click", () => {
   $("member-name").value = "";
   send({ type: "add_member", group: chat.name, username }).catch(markDisconnected);
 });
+
+// ------------------------------------------------------------- sending files
+// Images up to 5 MB, documents up to 10 MB, videos up to 25 MB (same rules as
+// chat/files.py; the server checks again). Files travel in 32 KB pieces, so
+// no single message is bigger than the 64 KB frame limit.
+const MB = 1024 * 1024;
+const CHUNK_BYTES = 32 * 1024;
+const FILE_KINDS = {
+  image: { extensions: [".jpg", ".jpeg", ".png", ".gif", ".webp"], limit: 5 },
+  document: { extensions: [".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".txt", ".csv"], limit: 10 },
+  video: { extensions: [".mp4", ".webm", ".mov"], limit: 25 },
+};
+const MIME_TYPES = {
+  ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".gif": "image/gif",
+  ".webp": "image/webp", ".mp4": "video/mp4", ".webm": "video/webm", ".mov": "video/quicktime",
+  ".pdf": "application/pdf", ".txt": "text/plain", ".csv": "text/csv",
+};
+const downloads = new Map(); // file id -> { parts, url, saveAs }
+
+function extensionOf(name) {
+  const dot = name.lastIndexOf(".");
+  return dot >= 0 ? name.slice(dot).toLowerCase() : "";
+}
+
+function fileKind(name) {
+  const extension = extensionOf(name);
+  const found = Object.entries(FILE_KINDS).find(([, rule]) => rule.extensions.includes(extension));
+  return found ? found[0] : null;
+}
+
+function humanSize(size) {
+  if (size >= MB) return `${(size / MB).toFixed(1)} MB`;
+  if (size >= 1024) return `${Math.round(size / 1024)} KB`;
+  return `${size} B`;
+}
+
+function toBase64(bytes) {
+  let binary = "";
+  for (let at = 0; at < bytes.length; at += 0x8000) {
+    binary += String.fromCharCode(...bytes.subarray(at, at + 0x8000));
+  }
+  return btoa(binary);
+}
+
+function fromBase64(text) {
+  const binary = atob(text);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+}
+
+$("attach").addEventListener("click", () => $("file-input").click());
+
+$("file-input").addEventListener("change", () => {
+  const file = $("file-input").files[0];
+  $("file-input").value = "";
+  if (file) sendFile(file).catch(markDisconnected);
+});
+
+async function sendFile(file) {
+  const kind = fileKind(file.name);
+  if (!kind) {
+    addToActive({ kind: "error", text: "This file type cannot be sent. Images: jpg, png, gif, webp. " +
+      "Documents: pdf, Word, Excel, PowerPoint, txt, csv. Videos: mp4, webm, mov." });
+    return;
+  }
+  const limit = FILE_KINDS[kind].limit;
+  if (file.size === 0) {
+    addToActive({ kind: "error", text: "The file is empty." });
+    return;
+  }
+  if (file.size > limit * MB) {
+    addToActive({ kind: "error",
+      text: `${kind[0].toUpperCase()}${kind.slice(1)}s are limited to ${limit} MB (this file is ${humanSize(file.size)}).` });
+    return;
+  }
+  const chat = state.chats.get(state.activeKey);
+  const upload = `${Date.now().toString(16)}${Math.random().toString(16).slice(2, 10)}`;
+  const start = { type: "file_start", upload, name: file.name, size: file.size, context: "general" };
+  if (chat.kind === "user") Object.assign(start, { context: "private", to: chat.name });
+  if (chat.kind === "group") Object.assign(start, { context: "group", group: chat.name });
+  const item = { kind: "local", text: `Sending ${file.name} (${humanSize(file.size)})...` };
+  state.uploads.set(upload, { key: chat.key, item });
+  addTo(chat.key, item, { countUnread: false });
+  await send(start);
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  let shown = 0;
+  for (let at = 0; at < bytes.length; at += CHUNK_BYTES) {
+    if (!state.uploads.has(upload)) return; // refused by the server
+    await send({ type: "file_chunk", upload, data: toBase64(bytes.subarray(at, at + CHUNK_BYTES)) });
+    const percent = Math.floor(((at + CHUNK_BYTES) / bytes.length) * 100);
+    if (percent - shown >= 10 && percent < 100) {
+      shown = percent;
+      item.text = `Sending ${file.name} (${humanSize(file.size)})... ${percent}%`;
+      if (state.activeKey === chat.key) renderMessages();
+    }
+  }
+  if (state.uploads.has(upload)) await send({ type: "file_end", upload });
+}
+
+function endUpload(upload) {
+  const sending = state.uploads.get(upload);
+  if (!sending) return;
+  state.uploads.delete(upload);
+  const chat = state.chats.get(sending.key);
+  if (!chat) return;
+  chat.items = chat.items.filter((item) => item !== sending.item);
+  if (state.activeKey === sending.key) renderMessages();
+}
+
+function addFileMessage(message, mine) {
+  let key = EVERYONE;
+  if (message.context === "group") {
+    key = `group:${message.group}`;
+    ensureChat(key, "group", message.group);
+  } else if (message.context === "private") {
+    key = privateChat(mine ? message.to : message.from).key;
+  }
+  addTo(key, bubble(message, mine), { countUnread: !message.history });
+  if (message.file.kind === "image") loadFile(message.file.id);
+}
+
+function loadFile(id, saveAs = false) {
+  const entry = downloads.get(id);
+  if (entry) {
+    if (saveAs && entry.url) saveFile(entry.url, entry.name);
+    else if (saveAs) entry.saveAs = true;
+    return;
+  }
+  downloads.set(id, { parts: [], url: null, saveAs });
+  send({ type: "file_get", id }).catch(markDisconnected);
+}
+
+function receiveFileData(message) {
+  const entry = downloads.get(message.id);
+  if (!entry) return;
+  if (message.type === "file_data_start") {
+    entry.name = message.name;
+    entry.parts = [];
+  } else if (message.type === "file_data") {
+    entry.parts.push(fromBase64(message.data));
+  } else {
+    const type = MIME_TYPES[extensionOf(entry.name || "")] || "application/octet-stream";
+    entry.url = URL.createObjectURL(new Blob(entry.parts, { type }));
+    entry.parts = null;
+    if (entry.saveAs) saveFile(entry.url, entry.name);
+    renderMessages();
+  }
+}
+
+function saveFile(url, name) {
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = name;
+  document.body.append(link);
+  link.click();
+  link.remove();
+}
+
+function fileBox(file) {
+  const box = element("span", "file-box");
+  const entry = downloads.get(file.id);
+  if (entry && entry.url && file.kind === "image") {
+    const image = document.createElement("img");
+    image.src = entry.url;
+    image.alt = file.name;
+    box.append(image);
+  } else if (entry && entry.url && file.kind === "video") {
+    const video = document.createElement("video");
+    video.src = entry.url;
+    video.controls = true;
+    box.append(video);
+  }
+  box.append(element("span", "file-name", file.name),
+    element("span", "file-meta", `${file.kind} · ${humanSize(file.size)}`));
+  if (file.kind === "video" && !(entry && entry.url)) {
+    box.append(actionButton(entry ? "Loading..." : "Play video", () => loadFile(file.id)));
+  } else if (file.kind === "image" && !(entry && entry.url)) {
+    box.append(element("span", "file-meta", "Loading image..."));
+  } else {
+    box.append(actionButton("Download", () => loadFile(file.id, true)));
+  }
+  return box;
+}
+
+function actionButton(text, onClick) {
+  const button = element("button", "file-action", text);
+  button.type = "button";
+  button.addEventListener("click", () => { onClick(); renderMessages(); });
+  return button;
+}

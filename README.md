@@ -81,6 +81,10 @@ The client checks the server's certificate, so it will refuse to connect to a se
 | `/leave <group>` | Leaves the group |
 | `/users` | Lists everyone who is online |
 | `/history <user>` | Shows your last 20 private messages with `<user>`, oldest first (only your own conversations) |
+| `/file <path>` | Sends an image, video or document to everyone |
+| `/pfile <user> <path>` | Sends a file privately to `<user>` (they must be online) |
+| `/gfile <group> <path>` | Sends a file to a group you are in |
+| `/get <id>` | Downloads a file into a `downloads/` folder (the id is shown next to the file) |
 | `/quit` | Leaves the chat (others are told you left) |
 | `/help` | Shows the list of commands |
 
@@ -176,6 +180,25 @@ Alice creates a group and adds Carol, Bob joins and later leaves. Every change s
 
 Group names are 1-30 letters, digits, underscores or hyphens. Only members can send to a group. If the admin leaves, the next member becomes admin, and an empty group is deleted.
 
+## Sending files
+
+Images, videos and documents can be sent to everyone, privately or to a group. In the web page, click the **paperclip** next to the message box: images and videos are shown in the chat, and every file has a Download button. In the terminal client, use `/file`, `/pfile`, `/gfile` and `/get`.
+
+| Kind | File types | Largest file |
+|---|---|---|
+| Image | `.jpg` `.jpeg` `.png` `.gif` `.webp` | **5 MB** |
+| Document | `.pdf` `.doc` `.docx` `.xls` `.xlsx` `.ppt` `.pptx` `.txt` `.csv` | **10 MB** |
+| Video | `.mp4` `.webm` `.mov` | **25 MB** |
+
+Other file types are refused. Both clients check the type and size before sending, and the server checks again.
+
+How it works (`chat/files.py`):
+
+- Every message on the network is still at most 64 KB, so a file is sent in 32 KB pieces (`file_start`, `file_chunk` ..., `file_end`) and downloaded the same way (`file_get`, then `file_data` pieces).
+- The server keeps files in a folder next to its database (`chat.db` -> `chat_files/`) under a random name, so a file name can never point outside that folder. Files survive a restart, and people who join later see earlier files in the history.
+- Only people who could see the message can download the file: anyone for Everyone, the two people in a private chat, or members of the group.
+- A connection can send at most 2 files at the same time, and a half-sent file is deleted if the sender disconnects.
+
 ## Persistence
 
 The server saves its data in one SQLite file, so a restart loses nothing. It uses Python's built-in `sqlite3`, so there is nothing extra to install.
@@ -210,6 +233,7 @@ chat/
   groups.py     group chat: members, admin, create/join/add/leave
   client.py     terminal client and command parsing
   storage.py    saves messages, groups and offline messages in SQLite (chat.db)
+  files.py      sending images, videos and documents: types, size limits, pieces
   config.py     host, port, TLS and database settings
   tls.py        TLS encryption for client and server sockets
   make_cert.py  creates the self-signed server certificate
