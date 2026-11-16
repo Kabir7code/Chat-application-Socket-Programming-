@@ -1,0 +1,25 @@
+........................................................................ [ 91%]
+..................................                                       [100%]
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.13.16-final-0 _______________
+
+Name                Stmts   Miss Branch BrPart  Cover
+-----------------------------------------------------
+chat/__init__.py        0      0      0      0   100%
+chat/client.py        230     67    102      4    72%
+chat/config.py         42      2     12      3    91%
+chat/files.py         130      5     36      3    95%
+chat/groups.py        117      3     36      4    95%
+chat/make_cert.py      36     10      8      3    70%
+chat/protocol.py       54      1     14      1    97%
+chat/registry.py       63      2      6      0    97%
+chat/server.py        373     18    128     13    93%
+chat/storage.py       165     15     24      2    91%
+chat/tls.py            27      0      2      0   100%
+chat/web.py           342     38     84     13    88%
+-----------------------------------------------------
+TOTAL                1579    161    452     46    89%
+Coverage HTML written to dir Final_Run_17_Nov/coverage_html
+Coverage JSON written to file Final_Run_17_Nov/coverage.json
+- Generated html report: file://Final_Run_17_Nov/unit_test_report.html -
+394 passed in 33.85s
