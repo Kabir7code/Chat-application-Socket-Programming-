@@ -171,6 +171,9 @@ function handleEvent(message) {
     case "private":
       addTo(privateChat(message.from).key, bubble(message, false));
       break;
+    case "private_history": // #53: saved messages of one private chat
+      addPrivateHistory(message);
+      break;
     case "private_sent":
       addTo(privateChat(message.to).key, bubble(message, true));
       followSend(`user:${message.to}`);
@@ -187,13 +190,15 @@ function handleEvent(message) {
 }
 
 function addChatMessage(message) {
+  // #53: saved messages you sent yourself still show on your side
+  const mine = Boolean(message.self) || (message.history && message.from === state.username);
   if (message.context !== "group") {
-    addTo(EVERYONE, bubble(message, Boolean(message.self)));
+    addTo(EVERYONE, bubble(message, mine), { countUnread: !message.history });
     return;
   }
   const key = `group:${message.group}`;
   ensureChat(key, "group", message.group);
-  addTo(key, bubble(message, Boolean(message.self)), { countUnread: !message.history });
+  addTo(key, bubble(message, mine), { countUnread: !message.history });
   if (message.self) followSend(key);
 }
 
@@ -204,8 +209,38 @@ function followSend(key) {
   }
 }
 
+// #53: put the saved messages of a private chat before anything that has
+// arrived since, skipping ones already on screen (same message ID).
+function addPrivateHistory({ with: name, messages }) {
+  const chat = privateChat(name);
+  chat.historyLoaded = true;
+  const shown = new Set(chat.items.map((item) => item.id).filter((id) => id !== undefined));
+  const earlier = messages
+    .filter((message) => !shown.has(message.id))
+    .map((message) => bubble(message, message.from === state.username));
+  if (earlier.length === 0) {
+    if (state.activeKey === chat.key && messages.length === 0) {
+      addToActive({ kind: "notice", text: `No earlier messages with ${name}` });
+    }
+    return;
+  }
+  chat.items = [...earlier, ...chat.items];
+  if (!chat.lastAt) chat.lastAt = ++state.activity;
+  if (state.activeKey === chat.key) renderMessages();
+  renderChrome();
+}
+
+function loadPrivateHistory(chat) {
+  if (chat.historyLoaded || chat.historyRequested) return;
+  chat.historyRequested = true;
+  send({ type: "private_history", with: chat.name }).catch(() => {
+    chat.historyRequested = false;
+  });
+}
+
 function bubble(message, mine) {
   return {
+    id: message.id,
     kind: mine ? "mine" : "incoming",
     from: message.from,
     text: message.text,
@@ -283,7 +318,7 @@ function lastLasting(chat) {
 
 function openChat(key) {
   // A person in the Online list has no chat until it is first opened.
-  if (key.startsWith("user:")) privateChat(key.slice(5));
+  if (key.startsWith("user:")) loadPrivateHistory(privateChat(key.slice(5)));
   state.activeKey = key;
   state.chats.get(key).unread = 0;
   $("chat-screen").classList.add("chat-open");

@@ -235,6 +235,14 @@ class ChatServer:
             self.store.remember_user(username)
             for waiting in self.store.take_offline(username):
                 session.send(waiting)
+            # #53: groups they are still in (kept over a server restart),
+            # with each group's saved messages, so a page or client that
+            # reconnects shows the same chats as before
+            for group in self.groups.groups_of(username):
+                session.send(self._group_update_message(
+                    self.groups.members(group), "member", group, username,
+                    f"You are in {group}"))
+                self._send_history(session, group)
         self._broadcast(
             system_message("join", username, f"{username} joined the chat"),
             exclude=session,
