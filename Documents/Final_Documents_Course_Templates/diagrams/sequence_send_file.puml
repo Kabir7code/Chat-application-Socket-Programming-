@@ -1,0 +1,47 @@
+@startuml
+' Sequence diagram 3: sending a file to a group and downloading it
+title Sequence 3: Send an image to a group and download it
+skinparam shadowing false
+skinparam sequenceMessageAlign left
+skinparam ParticipantBackgroundColor #FFF2B3
+skinparam DatabaseBackgroundColor #CFE8FF
+actor Alice
+participant "Alice's client\n(web page or terminal)" as CA
+participant "ChatServer\n(server.py)" as S
+participant "FileStore\n(files.py)" as F
+database "MessageStore\n(chat.db)" as DB
+participant "Group member\n(Bob)" as CB
+
+Alice -> CA : /gfile Squad cat.png  (or paperclip)
+CA -> CA : check type and size locally\n(image <= 5 MB, document <= 10 MB, video <= 25 MB)
+CA -> S : file_start {upload, name, size, group: "Squad"}
+S -> S : check type, size, membership of Squad
+alt not allowed
+  S --> CA : error FILE_TYPE_NOT_ALLOWED / FILE_TOO_LARGE / NOT_A_MEMBER
+else allowed
+  S -> F : start(owner, upload, ...) -> random 32-hex id
+  S --> CA : file_ready {upload}
+  loop every 32 KB piece (each frame stays under 64 KB)
+    CA -> S : file_chunk {upload, data (base64)}
+    S -> F : write(piece)
+  end
+  CA -> S : file_end {upload}
+  S -> F : end_upload() -> size must match, file kept under its id
+  group delivery lock
+    S -> DB : save_group(file message)
+    S -> CB : file {id, from: alice, group: Squad, file {kind, name, size}}
+    S -> DB : save_file(file details)
+  end
+  S --> CA : file_sent {upload}
+end
+
+CB -> S : file_get {id}
+S -> DB : get_file(id)
+S -> S : may Bob see it? (sender, recipient, or current group member)
+S --> CB : file_data_start {id, kind, name, size}
+loop every 32 KB piece
+  S --> CB : file_data {id, seq, data}
+end
+S --> CB : file_data_end {id}
+CB --> CB : show image in the chat / save to downloads/
+@enduml

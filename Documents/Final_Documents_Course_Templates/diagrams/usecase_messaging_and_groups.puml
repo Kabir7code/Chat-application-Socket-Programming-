@@ -1,0 +1,48 @@
+@startuml
+' Use case diagram 1: messaging and groups (UC-01 to UC-09)
+title Use Case Diagram 1: Messaging and groups
+left to right direction
+skinparam shadowing false
+skinparam usecaseBackgroundColor #FFF2B3
+skinparam usecaseBorderColor #333333
+actor User
+actor "Group Admin" as Admin
+actor "Server" as Server <<system>>
+User <|-- Admin
+
+rectangle "Real-Time Chat Application" {
+  usecase "UC-01 Register & connect" as UC1
+  usecase "Validate unique username" as V1
+  usecase "UC-02 Send private message" as UC2
+  usecase "Send message to everyone" as UCB
+  usecase "UC-03 Create group" as UC3
+  usecase "UC-04 Join group" as UC4
+  usecase "UC-05 Send group message" as UC5
+  usecase "UC-06 Add member to group" as UC6
+  usecase "UC-07 Leave group" as UC7
+  usecase "UC-08 View active users\n& group members" as UC8
+  usecase "UC-09 Leave chat" as UC9
+  usecase "Validate message content" as V2
+  usecase "Notify others of join / leave" as N
+  usecase "Handle unexpected disconnect" as D
+}
+User --> UC1
+User --> UCB
+User --> UC2
+User --> UC3
+User --> UC4
+User --> UC5
+User --> UC7
+User --> UC8
+User --> UC9
+Admin --> UC6
+UC1 ..> V1 : <<include>>
+UC1 ..> N : <<include>>
+UC2 ..> V2 : <<include>>
+UCB ..> V2 : <<include>>
+UC5 ..> V2 : <<include>>
+UC9 ..> N : <<include>>
+D ..> UC9 : <<extend>>
+Server --> D
+Server --> N
+@enduml

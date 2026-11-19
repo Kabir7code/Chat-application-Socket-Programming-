@@ -1,0 +1,49 @@
+@startuml
+' Sequence diagram 1: logging in and sending a message to everyone (FR-001, FR-003, FR-011)
+title Sequence 1: Log in and send a message to everyone
+skinparam monochrome false
+skinparam shadowing false
+skinparam sequenceMessageAlign left
+skinparam ParticipantBackgroundColor #FFF2B3
+skinparam DatabaseBackgroundColor #CFE8FF
+actor Alice
+participant "ClientApp\n(client.py)" as C
+participant "ChatServer\n(server.py)" as S
+participant "SessionRegistry\n(registry.py)" as R
+database "MessageStore\n(chat.db)" as DB
+participant "Other clients" as O
+
+Alice -> C : start client, type "alice"
+C -> S : TCP connect
+S -> S : enable keepalive, start handler thread
+C -> S : TLS handshake (TLS 1.2+, 10 s limit)
+C -> S : register {username: "alice"}
+S -> S : validate name (1-20 letters, digits, _)
+group delivery lock
+S -> R : register(session, "alice")
+alt name already online
+  R --> S : False
+  S --> C : error USERNAME_TAKEN
+  C --> Alice : "! Username already taken."
+else name free
+  R --> S : True
+  S --> C : registered {username, users}
+  S -> DB : recent_chat(20)
+  DB --> S : saved messages
+  S --> C : saved messages, marked "(earlier)"
+  S -> DB : remember_user("alice"), take_offline("alice")
+  S --> C : messages sent while away (if any)
+end
+end
+S -> O : system "alice joined the chat"
+
+Alice -> C : type "hi everyone"
+C -> S : chat {text: "hi everyone"}
+S -> S : check registered, not empty, <= 4000 chars
+group delivery lock (same order for everyone)
+  S -> S : add id + timestamp
+  S -> DB : save_chat(message)
+  S -> O : chat {id, time, from: alice, text}
+end
+O --> O : show "[14:05] alice: hi everyone"
+@enduml
