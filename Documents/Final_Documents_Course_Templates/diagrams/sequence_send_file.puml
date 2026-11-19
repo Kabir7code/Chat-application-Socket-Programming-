@@ -13,7 +13,7 @@ database "MessageStore\n(chat.db)" as DB
 participant "Group member\n(Bob)" as CB
 
 Alice -> CA : /gfile Squad cat.png  (or paperclip)
-CA -> CA : check type and size locally\n(image <= 5 MB, document <= 10 MB, video <= 25 MB)
+CA -> CA : check type and size locally\n(image <= 5 MB, document or audio <= 10 MB, video <= 25 MB)
 CA -> S : file_start {upload, name, size, group: "Squad"}
 S -> S : check type, size, membership of Squad
 alt not allowed

@@ -4,7 +4,7 @@ Real-Time Chat Application Using Socket Programming. Software Engineering (UE23C
 
 This file lists every place where the build differs from the SRS, the SAD, the Test Cases or the sprint process in the deliverables sheet, and why. It is updated at the end of each sprint and is what we will walk through in the final demo.
 
-Last updated: 17 Nov 2026 (section 9: documents moved to the course templates, file sharing). Before that: 11 Nov 2026, after Sprint 3 and the Part-3 testing (sections 5 to 8). Sections 1 to 4 are the Sprint 1 entries; their current status is in section 5.
+Last updated: 19 Nov 2026 (section 9: documents moved to the course templates, file sharing). Before that: 11 Nov 2026, after Sprint 3 and the Part-3 testing (sections 5 to 8). Sections 1 to 4 are the Sprint 1 entries; their current status is in section 5.
 
 ## 1. Process
 
@@ -87,5 +87,5 @@ Full results are in the Test Cases document and `Documents/Test_Reports/`:
 | # | Deviation | Reason | Action |
 |---|---|---|---|
 | A1 | The SRS, SAD and Test Plan were rewritten in the course templates (version 2.0), kept in `Documents/Final_Documents_Course_Templates/`; the earlier versions stay in `Documents/`. Requirement IDs are unchanged (FR-001 to FR-013, NFR-001 to NFR-007); FR-014 (web page, built in Sprint 2 as #16) is now written down as a requirement. | The templates were shared after the documents were first written. | SRS v2.0 adds security objectives, 15 security requirements, two use case diagrams and the RTM; SAD v2.0 adds three sequence diagrams, API design and a STRIDE threat model. |
-| A2 | File sharing (FR-015, FR-016, SR-14, SR-15) was added after Sprint 3 and is not part of any sprint. | Requested by the team for the final demo. | To be tracked as one issue with no sprint set, so the Sprint 3 burndown is unchanged. Covered by 56 automated tests (tests/test_files.py, tests/test_files_web.py). Limits: images 5 MB, documents 10 MB, videos 25 MB. |
+| A2 | File sharing (FR-015, FR-016, SR-14, SR-15) was added after Sprint 3 and is not part of any sprint. | Requested by the team for the final demo. | To be tracked as one issue with no sprint set, so the Sprint 3 burndown is unchanged. Audio was added on 19 Nov 2026. Covered by 64 automated tests (tests/test_files.py, tests/test_files_web.py). Limits: images 5 MB, documents and audio 10 MB, videos 25 MB. |
 | A3 | The web history feature (#53) uploaded in PR #68 is restored in the same branch. | PR #68 put its files at the repository root (S4), so the feature had never reached the app. | Changes applied to chat/server.py, chat/static/app.js and tests/test_web_history.py. |
