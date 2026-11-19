@@ -1,4 +1,4 @@
-"""Sending images, videos and documents.
+"""Sending images, videos, audio and documents.
 
 What is allowed (checked by the clients before sending and again by the server):
 
@@ -6,6 +6,7 @@ What is allowed (checked by the clients before sending and again by the server):
     image      .jpg .jpeg .png .gif .webp                          5 MB
     document   .pdf .doc .docx .xls .xlsx .ppt .pptx .txt .csv     10 MB
     video      .mp4 .webm .mov                                     25 MB
+    audio      .mp3 .wav .m4a .aac .ogg                            10 MB
 
 A file never travels in one message: every frame on the wire is still limited
 to 64 KB (protocol.MAX_FRAME_BYTES, SR-5). The sender splits the file into
@@ -37,7 +38,9 @@ KINDS = {
     "document": ({".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".txt", ".csv"},
                  10 * MB),
     "video": ({".mp4", ".webm", ".mov"}, 25 * MB),
+    "audio": ({".mp3", ".wav", ".m4a", ".aac", ".ogg"}, 10 * MB),
 }
+PLURALS = {"image": "Images", "document": "Documents", "video": "Videos", "audio": "Audio files"}
 CHUNK_BYTES = 32 * 1024  # raw bytes per piece; about 43 KB once base64-encoded
 MAX_UPLOADS_PER_USER = 2  # files one connection may be sending at the same time
 NAME_LENGTH = 100
@@ -54,7 +57,7 @@ class FileRejected(Exception):
 
 
 def kind_of(name):
-    """'image', 'document' or 'video' for an allowed file name, else None."""
+    """'image', 'document', 'video' or 'audio' for an allowed file name, else None."""
     extension = os.path.splitext(str(name))[1].lower()
     for kind, (extensions, _) in KINDS.items():
         if extension in extensions:
@@ -83,7 +86,7 @@ def check(name, size):
         raise FileRejected("EMPTY_FILE", "The file is empty.")
     if size > limit:
         raise FileRejected("FILE_TOO_LARGE",
-                           f"{kind.capitalize()}s are limited to {limit // MB} MB "
+                           f"{PLURALS[kind]} are limited to {limit // MB} MB "
                            f"(this file is {human_size(size)}).")
     return kind, safe_name(name)
 

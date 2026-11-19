@@ -58,3 +58,7 @@ def test_page_has_the_attach_button_and_same_limits():
         for extension in extensions:
             assert f'"{extension}"' in APP_JS
     assert f"const CHUNK_BYTES = {files.CHUNK_BYTES // 1024} * 1024;" in APP_JS
+    for kind in files.KINDS:
+        assert f'{kind}: "{files.PLURALS[kind]}"' in APP_JS
+    accept = INDEX.split('accept="', 1)[1].split('"', 1)[0].split(",")
+    assert sorted(accept) == sorted(e for extensions, _ in files.KINDS.values() for e in extensions)

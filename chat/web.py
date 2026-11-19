@@ -313,7 +313,7 @@ def make_handler(gateway):
             self.send_header("Content-Length", str(len(body)))
             self.send_header("Cache-Control", "no-cache")
             self.send_header("X-Content-Type-Options", "nosniff")
-            # Shared images and videos are shown from blob: URLs the page
+            # Shared images, videos and audio are shown from blob: URLs the page
             # makes itself from the downloaded bytes; nothing else is allowed.
             self.send_header("Content-Security-Policy",
                              "default-src 'self'; img-src 'self' blob:; media-src 'self' blob:")

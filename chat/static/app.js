@@ -549,10 +549,14 @@ const FILE_KINDS = {
   image: { extensions: [".jpg", ".jpeg", ".png", ".gif", ".webp"], limit: 5 },
   document: { extensions: [".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".txt", ".csv"], limit: 10 },
   video: { extensions: [".mp4", ".webm", ".mov"], limit: 25 },
+  audio: { extensions: [".mp3", ".wav", ".m4a", ".aac", ".ogg"], limit: 10 },
 };
+const FILE_PLURALS = { image: "Images", document: "Documents", video: "Videos", audio: "Audio files" };
 const MIME_TYPES = {
   ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".gif": "image/gif",
   ".webp": "image/webp", ".mp4": "video/mp4", ".webm": "video/webm", ".mov": "video/quicktime",
+  ".mp3": "audio/mpeg", ".wav": "audio/wav", ".m4a": "audio/mp4", ".aac": "audio/aac",
+  ".ogg": "audio/ogg",
   ".pdf": "application/pdf", ".txt": "text/plain", ".csv": "text/csv",
 };
 const downloads = new Map(); // file id -> { parts, url, saveAs }
@@ -611,7 +615,7 @@ async function sendFile(file) {
   }
   if (file.size > limit * MB) {
     addToActive({ kind: "error",
-      text: `${kind[0].toUpperCase()}${kind.slice(1)}s are limited to ${limit} MB (this file is ${humanSize(file.size)}).` });
+      text: `${FILE_PLURALS[kind]} are limited to ${limit} MB (this file is ${humanSize(file.size)}).` });
     return;
   }
   const chat = state.chats.get(state.activeKey);
@@ -710,11 +714,18 @@ function fileBox(file) {
     video.src = entry.url;
     video.controls = true;
     box.append(video);
+  } else if (entry && entry.url && file.kind === "audio") {
+    const audio = document.createElement("audio");
+    audio.src = entry.url;
+    audio.controls = true;
+    box.append(audio);
   }
   box.append(element("span", "file-name", file.name),
     element("span", "file-meta", `${file.kind} · ${humanSize(file.size)}`));
   if (file.kind === "video" && !(entry && entry.url)) {
     box.append(actionButton(entry ? "Loading..." : "Play video", () => loadFile(file.id)));
+  } else if (file.kind === "audio" && !(entry && entry.url)) {
+    box.append(actionButton(entry ? "Loading..." : "Play audio", () => loadFile(file.id)));
   } else if (file.kind === "image" && !(entry && entry.url)) {
     box.append(element("span", "file-meta", "Loading image..."));
   } else {

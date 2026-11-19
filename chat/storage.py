@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS users (
 -- next to the database, under the random id)
 CREATE TABLE IF NOT EXISTS files (
     id        TEXT PRIMARY KEY,                   -- random, 32 hex characters
-    kind      TEXT    NOT NULL,                   -- image / document / video
+    kind      TEXT    NOT NULL,                   -- image / document / video / audio
     name      TEXT    NOT NULL,                   -- the original (cleaned) name
     size      INTEGER NOT NULL,
     sender    TEXT    NOT NULL,

@@ -401,6 +401,13 @@ svg { display: block; width: 100%; height: 100%; }
 
 .file-box { display: block; margin-top: 2px; font-style: normal; }
 
+.file-box audio {
+  display: block;
+  width: 260px;
+  max-width: 70vw;
+  margin: 4px 0;
+}
+
 .file-box img, .file-box video {
   display: block;
   max-width: min(320px, 100%);

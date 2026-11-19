@@ -182,13 +182,14 @@ Group names are 1-30 letters, digits, underscores or hyphens. Only members can s
 
 ## Sending files
 
-Images, videos and documents can be sent to everyone, privately or to a group. In the web page, click the **paperclip** next to the message box: images and videos are shown in the chat, and every file has a Download button. In the terminal client, use `/file`, `/pfile`, `/gfile` and `/get`.
+Images, videos, audio and documents can be sent to everyone, privately or to a group. In the web page, click the **paperclip** next to the message box: images are shown in the chat, videos and audio play in the chat, and every other file has a Download button. In the terminal client, use `/file`, `/pfile`, `/gfile` and `/get`.
 
 | Kind | File types | Largest file |
 |---|---|---|
 | Image | `.jpg` `.jpeg` `.png` `.gif` `.webp` | **5 MB** |
 | Document | `.pdf` `.doc` `.docx` `.xls` `.xlsx` `.ppt` `.pptx` `.txt` `.csv` | **10 MB** |
 | Video | `.mp4` `.webm` `.mov` | **25 MB** |
+| Audio | `.mp3` `.wav` `.m4a` `.aac` `.ogg` | **10 MB** |
 
 Other file types are refused. Both clients check the type and size before sending, and the server checks again.
 

@@ -1,4 +1,4 @@
-"""Sending images, videos and documents (chat/files.py)."""
+"""Sending images, videos, audio and documents (chat/files.py)."""
 
 import base64
 import os
@@ -82,6 +82,8 @@ DATA = os.urandom(100_000)  # more than 3 pieces
     ("cat.png", "image"), ("Photo.JPG", "image"), ("a.webp", "image"),
     ("notes.pdf", "document"), ("plan.docx", "document"), ("data.csv", "document"),
     ("clip.mp4", "video"), ("clip.webm", "video"), ("clip.MOV", "video"),
+    ("song.mp3", "audio"), ("voice.m4a", "audio"), ("note.WAV", "audio"), ("a.ogg", "audio"),
+    ("a.aac", "audio"),
 ])
 def test_allowed_types(name, kind):
     assert files.check(name, 1000)[0] == kind
@@ -95,13 +97,19 @@ def test_other_types_are_refused(name):
     assert err.value.code == "FILE_TYPE_NOT_ALLOWED"
 
 
-@pytest.mark.parametrize("name, limit", [("a.png", 5), ("a.pdf", 10), ("a.mp4", 25)])
+@pytest.mark.parametrize("name, limit", [("a.png", 5), ("a.pdf", 10), ("a.mp4", 25), ("a.mp3", 10)])
 def test_size_limits(name, limit):
     assert files.check(name, limit * MB)  # exactly the limit is fine
     with pytest.raises(files.FileRejected) as err:
         files.check(name, limit * MB + 1)
     assert err.value.code == "FILE_TOO_LARGE"
     assert f"{limit} MB" in err.value.message
+
+
+def test_limit_message_names_the_kind():
+    with pytest.raises(files.FileRejected) as err:
+        files.check("song.mp3", 11 * MB)
+    assert err.value.message.startswith("Audio files are limited to 10 MB")
 
 
 @pytest.mark.parametrize("size", [0, -5, "10", None, True])
@@ -158,6 +166,17 @@ def test_private_file_reaches_only_the_recipient(server, connect):
     assert download(carol, got["file"]["id"])["code"] == "FILE_NOT_FOUND"
     assert download(bob, got["file"]["id"]) == DATA
     assert download(alice, got["file"]["id"]) == DATA  # the sender can too
+
+
+def test_audio_file_to_a_group(server, connect):
+    alice, bob = connect("alice"), connect("bob")
+    make_group(alice, "Squad", bob)
+    voice = bytes(range(256)) * 300  # about 75 KB, several pieces
+    upload(alice, "voice note.m4a", voice, context="group", group="Squad")
+    got = bob.recv_until("file")
+    assert got["file"]["kind"] == "audio" and got["file"]["name"] == "voice note.m4a"
+    assert got["text"].startswith("[audio] voice note.m4a")
+    assert download(bob, got["file"]["id"]) == voice
 
 
 def test_private_file_to_offline_user_is_refused(server, connect):

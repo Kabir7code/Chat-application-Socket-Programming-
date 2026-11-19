@@ -10,7 +10,7 @@ Commands:
     /g <group> <text>      message everyone in a group
     /users                 list who is online
     /history <user>        your last private messages with a user
-    /file <path>           send an image, video or document to everyone
+    /file <path>           send an image, video, audio or document to everyone
     /pfile <user> <path>   send a file privately
     /gfile <group> <path>  send a file to a group
     /get <id>              download a file into the downloads/ folder
@@ -38,13 +38,13 @@ HELP = """Commands:
   /g <group> <text>      message everyone in a group
   /users                 list who is online
   /history <user>        your last private messages with a user
-  /file <path>           send an image, video or document to everyone
+  /file <path>           send an image, video, audio or document to everyone
   /pfile <user> <path>   send a file privately
   /gfile <group> <path>  send a file to a group
   /get <id>              download a file into the downloads/ folder
   /quit                  leave the chat
   /help                  show this help
-Files: images up to 5 MB, documents up to 10 MB, videos up to 25 MB."""
+Files: images up to 5 MB, documents and audio up to 10 MB, videos up to 25 MB."""
 
 # command -> (message type, field names, usage text). The last field takes
 # the rest of the line, so group messages can contain spaces.
