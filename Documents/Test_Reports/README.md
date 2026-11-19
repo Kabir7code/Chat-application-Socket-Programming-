@@ -2,6 +2,8 @@
 
 Testing of the chat application after Sprint 3, run on 11 Nov 2026 according to the [Test Plan](../Test_Plan.docx) (version 1.1).
 
+**Final results (19 Nov 2026):** every test was run again on the finished app (with the #53 fix and file sharing, including audio) in [`Final_Run/`](Final_Run): 402 automated tests and 20 system tests pass, 86 of the 88 test cases pass and 2 are partial, coverage 89.7% of lines and 84.3% of branches. The reports below are the Part-3 run of 11 Nov.
+
 | Report | Files | What it shows |
 |---|---|---|
 | Unit Test Report | `Unit_Test_Report.pdf` / `.docx`, `unit_test_report.html`, `junit*.xml` | The automated suite (338 tests, all passing on Python 3.10, 3.12 and 3.13) and the unit test cases UT_01 to UT_30 |
