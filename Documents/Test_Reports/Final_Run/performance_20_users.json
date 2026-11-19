@@ -1,0 +1,20 @@
+{
+ "users": 20,
+ "rounds": 10,
+ "messages_sent": 200,
+ "group_deliveries_expected": 1900,
+ "group_deliveries": 1900,
+ "private_deliveries_expected": 100,
+ "private_deliveries": 100,
+ "elapsed_s": 2.56,
+ "group": {
+  "median_ms": 48.5,
+  "p95_ms": 58.8,
+  "max_ms": 68.0
+ },
+ "private": {
+  "median_ms": 49.0,
+  "p95_ms": 59.9,
+  "max_ms": 64.5
+ }
+}
